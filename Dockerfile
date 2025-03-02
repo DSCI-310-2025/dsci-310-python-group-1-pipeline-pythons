@@ -1,5 +1,6 @@
 FROM jupyter/base-notebook:python-3.11
 
+USER root
 
 RUN pip install pandas==2.2.3 \
     matplotlib==3.10.1 \
@@ -8,15 +9,17 @@ RUN pip install pandas==2.2.3 \
     numpy==1.26.4 \
     scikit-learn==1.3.0
 
-COPY . /app/
+RUN mkdir -p /app && chown -R root:root /app && chmod -R 777 /app
 
 WORKDIR /app
+
+COPY . /app/
 
 RUN mkdir -p /root/.jupyter && \
     echo "c.NotebookApp.token = ''" >> /root/.jupyter/jupyter_notebook_config.py && \
     echo "c.NotebookApp.password = ''" >> /root/.jupyter/jupyter_notebook_config.py
 
-USER root
+
 RUN chown -R root /app
 
 EXPOSE 8888
