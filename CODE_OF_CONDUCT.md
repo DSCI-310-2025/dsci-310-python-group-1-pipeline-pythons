@@ -1,41 +1,59 @@
-Here we outline the standards of behavior expected from all team members, reinforcing a collaborative and ethical environment.​ A Code of Conduct (CoC) is critical for a respectful, inclusive, and professional environment within our data science group project.
+# Code of Conduct
 
-1. Purpose
+## Introduction
+​We are committed to creating a friendly and respectful environment for learning, teaching, and contributing. All participants in our group project and communications are expected to show respect and courtesy to others.​
 
-Our CoC aims to promote a positive environment where every member feels valued and respected, regardless of background or identity. It serves as a guideline for acceptable behavior and outlines procedures for addressing misconduct.​
+To clarify our expectations, everyone participating in our group project is required to adhere to this Code of Conduct. This Code applies to all project-related spaces, including, but not limited to, meetings, email communications, and online platforms such as GitHub. All project members are responsible for assisting with the enforcement of the Code of Conduct.​
 
-2. Scope
+The project lead(s) are responsible for enforcing the Code of Conduct. All reports of misconduct will be reviewed by the project lead(s) and will be kept confidential.
 
-This CoC applies to all participants of the project, including contributors, maintainers, and participants, both online and offline. It incorporates interactions in meetings, workshops, social media, and any other project-related events.​
+### Statement on  diversity and inclusivity 
+In our data science group project, we are committed to fostering a diverse and inclusive atmosphere where every member feels valued and respected. We believe that having diversity in all its forms—including race, ethnicity, gender, age, sexual orientation, disability, and cultural background—enhances creativity, innovation, and collaboration.
 
-3. Expected Behavior
+### Expected Behavior
 
-- Treat everyone with respect, valuing diverse perspectives and experiences.​
+All participants in our events and communications are expected to show respect
+and courtesy to others. All interactions should be professional regardless of
+platform: either online or in-person.Some of the examples of behaviour that plays part in a positive environment for our group project members are:
 
-- Engage in objective and constructive discussions, providing and accepting feedback gracefully, and working towards shared goals.​
+- Focusing on what is best for the team members and the surrounding community
+- Using welcoming and inclusive language
+- Respecting different perspectives and experiences
+- Gracefully accept constructive criticism
+- Show courtesy and respect towards other community members
+- Engage authentically in all project activities, contributing to discussions, tasks, and collaborative efforts.
+- Maintain a high standard of professionalism in all interactions, including adhering to agreed-upon deadlines, delivering quality work, and communicating effectively
+-  Respect the privacy of all members by safeguarding personal information and project-related data, ensuring it is not disclosed without proper authorization
 
-- Abide by to ethical standards in data handling, analysis, and reporting. Ensure transparency and honesty in all project activities.​
+Note: See the [four social rules](https://www.recurse.com/manual#sub-sec-social-rules) for further recommendations.
 
-4. Unacceptable Behavior
+### Unacceptable Behavior
 
-- Harassment and Discrimination: Any form of harassment, discrimination, or exclusionary behavior based on race, gender, age, sexual orientation, disability, or any other personal characteristic is prohibited.​
+Unacceptable behaviors for participants in our group project include, but are not limited to:
 
-- Unprofessional Conduct: This includes inappropriate language, personal attacks, or any behavior that could be perceived as hostile or degrading.​
+- making written or verbal remarks that exclude or demean individuals based on their membership in any specific group
+- using language that conveys threats of violence or directs violent intentions toward another person.
+- engaging in actions that cause someone to fear for their safety, such as stalking, following, or intimidation.
+- directing unsolicited sexual advances or attention toward another individual.
+- initiating physical contact without the other person's consent
+- persistently interrupting talks, events, or communications, hindering the project's collaborative environment.
+- insults or put downs
+- sexist, racist, homophobic, transphobic, ableist, or exclusionary jokes
+- excessive swearing
+- encouraging violence, suicide, or self-harm.
+- sharing private communications or personal information without the individual's consent.
 
-- Misuse of Data: Engaging in unethical practices such as data fabrication, falsification, or plagiarism is strictly forbidden.​
+### Consequences of Unacceptable Behavior
 
+Participants are expected to immediately stop any inappropriate behavior upon request. This expectation applies across all platforms and events associated with our group project, whether online or in-person. Should a participant violate the Code of Conduct, the team may issue a warning and, if necessary, involve the DSCI 310 Instructor to investigate the violation and determine appropriate sanctions. Consequences may include temporary or permanent removal from the project, bans from the project's communication channels (e.g., GitHub issues, emails, private messaging applications), and, in cases of legal violations, reports to the appropriate authorities.
 
-5. Reporting and Enforcement
+### Incident Reporting Guidelines
 
-Reporting Misconduct: If you experience or witness unacceptable behavior, report it to the designated CoC enforcement officers. All reports will be handled confidentially.​
+​If you witness or experience any behavior that violates the Code of Conduct at any platform or event where Python Group 1 is represented, whether online or in-person, please report it promptly to the current members of Python Group 1. The current members are:
 
-Consequences: Violations of the CoC may result in actions such as warnings, temporary suspension, or permanent removal from the project, depending on the severity of the misconduct.​
+- Zhanerke Zhumash, email to: szhanerz[-at-]gmail.com
+- Stallon Pinto, email to: stallonpinto03[-at-]gmail.com
+- Ayush Joshi, email to: ayushmehuljoshi[-at-]gmail.com
 
-6. Acknowledgment
-
-By participating in this project, you agree to abide by this Code of Conduct and understand that maintaining a respectful and inclusive environment is a collective responsibility.​
-
-This CoC is inspired by established guidelines from organizations such as the Data Science Association and the Academic Data Science Alliance. ​
-datascienceassn.org
-
-Regular reviews and updates to this CoC will be conducted to ensure its relevance and effectiveness in promoting a positive project environment.
+## Attribution 
+- Adapted from the [Carpentries Code of Conduct](https://docs.carpentries.org/topic_folders/policies/code-of-conduct.html) and [Contributor Covenant, version 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) and [Vox Media Coc](https://code-of-conduct.voxmedia.com/)
