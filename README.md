@@ -11,6 +11,8 @@ ___
 ### Summary of the project 
 This project aims to develop a predictive model to assess the credit risk of loan applicants using the Statlog (German Credit Data) dataset. The primary objective is to determine whether an applicant is a good or bad credit risk based on various demographic and financial attributes. We explored a few models and landed on a Random Forest classifier as it had the highest accuracy and was also able to minimize false negatives, which is crucial for reducing the risk of approving applicants with poor creditworthiness.
 
+___
+
 ### Instructions on how to run the data analysis
 To run the data analysis, you can use the provided Docker setup. Follow these steps:
 
@@ -31,7 +33,7 @@ To run the data analysis, you can use the provided Docker setup. Follow these st
    ```
 
 This will start a Jupyter Notebook server accessible at `http://localhost:8888`. Make sure to replace <docker-username> with your dockerhub username.
-–––
+___
 ### A list of the dependencies needed to run your analysis
 The analysis requires the following Python packages, which are installed in the Docker image:
 - pandas==2.2.3
@@ -40,6 +42,6 @@ The analysis requires the following Python packages, which are installed in the 
 - scipy==1.11.3
 - numpy==1.26.4
 - scikit-learn==1.3.0
-–––
+___
 ###  The names of the licenses contained in LICENSE.md:
 - MIT License
