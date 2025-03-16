@@ -22,7 +22,7 @@ all: $(MODEL_OUTPUT) $(REPORT_HTML) $(REPORT_PDF)
 # Preprocess data
 $(PROCESSED_DATA): $(RAW_DATA) $(SRC_DIR)/preprocess_data.py
 	@echo "Preprocessing data..."
-	$(PYTHON) $(SRC_DIR)/preprocess.py --input $(RAW_DATA) --output $(PROCESSED_DATA)
+	$(PYTHON) $(SRC_DIR)/preprocess_data.py --input $(RAW_DATA) --output $(PROCESSED_DATA)
 
 # Run analysis
 $(MODEL_OUTPUT): $(PROCESSED_DATA) $(SRC_DIR)/exploratory_analysis.py
