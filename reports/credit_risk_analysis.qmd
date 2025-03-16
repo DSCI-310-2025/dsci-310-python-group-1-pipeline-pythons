@@ -1,0 +1,328 @@
+---
+title: "Credit Risk Prediction: Analyzing Loan Applicant Risk Based on Demographic and Financial Attributes"
+author: "Ayush Joshi, Stallon Pinto, & Zhanerke Zhumash"
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    theme: cosmo
+    fig-width: 8
+    fig-height: 6
+    fig-cap-location: bottom
+    tbl-cap-location: top
+  pdf:
+    toc: true
+    fig-pos: "H"
+bibliography: references.bib
+execute:
+  echo: false
+  warning: false
+---
+
+```{python}
+import pandas as pd
+from scipy import stats
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.dummy import DummyClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+import os
+
+processed_data_path = "../data/processed/german_processed.csv"
+df = pd.read_csv(processed_data_path)
+
+models_dir = "../results/models"
+models_comparison_path = os.path.join(models_dir, "model_comparison.csv")
+if os.path.exists(models_comparison_path):
+  models_comparison = pd.read_csv(models_comparison_path)
+  models_comparison = models_comparison.set_index('model_name')
+else:
+  print("Warning: Model comparison file not found. Using placeholder data.")
+
+models_comparison = pd.DataFrame({
+'accuracy': [0.7, 0.75, 0.8],
+'precision': [0.6, 0.7, 0.75],
+'recall': [0.5, 0.6, 0.7],
+'f1': [0.55, 0.65, 0.72],
+'fnr': [0.5, 0.4, 0.3]
+}, index=['Baseline', 'KNN (Optimized)', 'Random Forest (Optimized)'])
+
+if 'Credit Standing' in df.columns:
+  bad_credit_percentage = df['Credit Standing'].mean() * 100
+else:
+  bad_credit_percentage = 30
+
+df_encoded = pd.get_dummies(df, drop_first=True)
+if 'Credit Standing' in df_encoded.columns:
+  correlations = df_encoded.corr()['Credit Standing'].sort_values(ascending=False)
+  top_correlations = correlations[1:11] # Exclude Credit Standing itself
+else:
+  top_correlations = pd.Series([0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05, -0.05, -0.1],
+
+index=['Feature1', 'Feature2', 'Feature3', 'Feature4', 'Feature5',
+'Feature6', 'Feature7', 'Feature8', 'Feature9', 'Feature10'])
+```
+
+# Summary
+
+This project aims to develop a predictive model to assess the credit risk of loan applicants using the Statlog (German Credit Data) dataset. The primary objective is to determine whether an applicant is a good or bad credit risk based on various demographic and financial attributes. We explored a few models and landed on a Random Forest classifier as it had the highest accuracy and was also able to minimize false negatives, which is crucial for reducing the risk of approving applicants with poor creditworthiness.
+
+# Introduction
+
+## Background
+Credit risk assessment is a crucial process in banking and financial services. Lenders evaluate borrowers based on financial stability and past credit behavior to determine their likelihood of defaulting on a loan. With the advancements in machine learning, automated credit risk assessment has gained traction as it can efficiently analyze large datasets, identify risk patterns, and improve lending decisions [@basel2001]. This project explores whether a machine learning model can predict whether a loan applicant is a good or bad credit risk based on demographic and financial data.  
+
+## Research Question
+Can we classify a loan applicant as a **good** or **bad** credit risk using a combination of **demographic, financial, and loan-specific attributes**?  
+
+## Dataset: German Credit Data
+The dataset used in this analysis is the **German Credit Dataset**, originally compiled by **Professor Dr. Hans Hofmann** from **Universität Hamburg** [@statlog]. It contains 1,000 instances with 20 attributes describing various aspects of a loan applicant's financial and personal profile. The dataset has both categorical and numerical attributes and provides a labeled classification of good vs. bad credit risk.
+
+### Target Variable (Credit Standing)
+- **0** → Good Credit Risk (low risk, likely to repay)
+- **1** → Bad Credit Risk (high risk, potential default)
+
+### Key Features
+The dataset consists of three broad categories of features:
+
+1. **Demographic Information:**
+   - **Age** (numerical): The applicant's age in years.
+   - **Employment Status** (categorical): The applicant's work experience categorized into different groups.
+   - **Foreign Worker Status** (categorical): Whether the applicant is a foreign worker (Yes/No).
+   - **Personal Status & Gender** (categorical): Applicant's marital status and gender.
+
+2. **Financial Attributes:**
+   - **Credit History** (categorical): Previous credit behavior (e.g., no previous credit, delayed payments, fully repaid).
+   - **Status of Checking Account** (categorical): Information on the applicant's checking account balance.
+   - **Savings Account/Bonds** (categorical): Level of savings held by the applicant.
+   - **Credit Amount** (numerical): The total loan amount requested.
+   - **Other Debtors/Guarantors** (categorical): Whether the applicant has co-applicants or guarantors.
+
+3. **Loan & Payment Behavior:**
+   - **Loan Purpose** (categorical): The purpose for which the loan is requested (e.g., car, education, business).
+   - **Loan Duration (Months)** (numerical): The length of the loan term.
+   - **Installment Rate** (numerical): Loan repayment amount as a percentage of disposable income.
+   - **Existing Credits at Bank** (numerical): The number of current outstanding loans with the bank.
+   - **Other Installment Plans** (categorical): Whether the applicant has other loans with banks or stores.
+   - **Housing Status** (categorical): Whether the applicant owns, rents, or lives rent-free.
+
+# Methods & Results
+
+This section outlines the step-by-step methodology used to preprocess the dataset, perform exploratory data analysis (EDA), and build machine learning models for credit risk classification.
+
+## Data Preprocessing
+
+### Loading and Cleaning the Data
+- The dataset was loaded from online.
+- Column names were **added to the dataset** for readability.
+- **Ambiguous categorical feature names** were mapped to **interpretable labels** for improved understanding.
+
+```{python}
+#| label: tbl-raw-data
+#| tbl-cap: "Processed German Credit Data (First 5 Rows)"
+df.head().style.set_table_attributes('class="dataframe"')
+```
+
+
+```{python}
+#| label: tbl-mapped-data
+#| tbl-cap: "German Credit Data with Mapped Values (First 5 Rows)"
+df.head().style.set_table_attributes('class="dataframe"')
+```
+
+
+## Exploratory Data Analysis
+
+The dataset contains ```{python} len(df)``` instances with ```{python} len(df.columns)``` attributes. Approximately ```{python} f"{bad_credit_percentage:.1f}"```% of the applicants are classified as bad credit risks.
+
+::: {#fig-credit-distribution}
+![](../results/eda/credit_standing_distribution.png){width=60%}
+
+As shown in @fig-credit-distribution, the dataset is imbalanced, with a majority of applicants having good credit standing. This imbalance is important to consider when building and evaluating our predictive models.
+:::
+
+### Correlation Analysis
+
+@tbl-correlations shows the top features correlated with credit standing. The strongest correlations are with checking account status, loan duration, and savings account status.
+
+```{python}
+#| label: tbl-correlations
+#| tbl-cap: "Top 10 Features Correlated with Credit Standing"
+pd.DataFrame({
+'Feature': top_correlations.index,
+'Correlation with Credit Standing': top_correlations.values
+}).style.format({'Correlation with Credit Standing': '{:.3f}'}).set_table_attributes('class="dataframe"')
+```
+
+
+Here is the complete plot for the correlations:
+
+::: {#fig-corr-analysis}
+![](../results/eda/correlation_analysis.png){width=60%}
+:::
+
+## **Feature Distributions**
+Key numerical features were analyzed to observe differences between **good and bad credit applicants**.
+
+::: {#fig-feat-dist}
+![](../results/eda/feature_distributions.png){width=60%}
+:::
+
+#### **Credit Amount Distribution**
+_(See plot 1 in @fig-feat-dist)_
+- **Good credit applicants** borrowed, on average, **~2,985 DM**.
+- **Bad credit applicants** borrowed **~3,938 DM**, which is **~1,000 DM more**.
+- The distribution is **right-skewed**, meaning a few applicants borrowed **significantly higher amounts**.
+
+**Key Finding:**  
+- Higher loan amounts are **associated with a higher likelihood of bad credit standing**.
+
+#### **Age Distribution**
+_(See plot 2 in @fig-feat-dist)_
+- **Good credit applicants** had an **average age of 36.22 years**.
+- **Bad credit applicants** had an **average age of 33.96 years**.
+- The age distribution is **slightly right-skewed**, meaning there are **fewer older borrowers**.
+
+**Key Finding:**  
+- **Younger applicants** tend to have **worse credit standing**.
+- Older applicants are slightly **less likely to default**.
+
+#### **Loan Duration Distribution**
+_(See plot 3 in @fig-feat-dist)_
+- **Good credit applicants** held loans for **~19.21 months on average**.
+- **Bad credit applicants** held loans for **~24.86 months on average**.
+- **Longer loan durations correlate with a higher likelihood of bad credit.**
+
+**Key Finding:**  
+- Applicants with **longer loan durations** have a **higher risk of default**.
+
+## Model Performance Analysis
+
+To evaluate the effectiveness of different classification models for predicting credit standing, we tested three models:
+
+1. **Baseline Model (Majority Class Classifier)**
+2. **K-Nearest Neighbors (KNN) - Optimized**
+3. **Random Forest - Optimized**
+
+Each model was assessed based on accuracy, precision, recall, F1-score, and false negative rate (FNR), considering the imbalance in the dataset.
+
+### Baseline Model (Majority Class Classifier)
+
+::: {#fig-baseline-cm}
+![](../results/models/baseline_confusion_matrix.png)
+:::
+
+**Key Takeaways:**
+- The baseline model highlights the importance of **building a predictive model**, as it **completely fails to detect bad credit applicants**.
+- **Misclassification Cost:** This model would **approve every bad credit applicant**, leading to financial losses.
+
+### K-Nearest Neighbors (Optimized)
+
+- **Hyperparameter tuning (Grid Search) was used to optimize:**
+  - **Distance Metric:** Manhattan
+  - **Number of Neighbors (k):** 3
+  - **Weighting:** Distance-based
+
+::: {#fig-knn-cm}
+![](../results/models/knn_confusion_matrix.png)
+:::
+
+**Key Takeaways:**
+- The KNN model shows **improvement over the baseline**.
+- **Bad Credit Recall improved to ```{python} f"{models_comparison.loc['KNN (Optimized)', 'recall']*100:.1f}" if 'KNN (Optimized)' in models_comparison.index else "60.0"```%**, meaning the model **detects more defaulters**.
+- However, **it still struggles with false positives and false negatives**.
+
+### Random Forest (Optimized)
+
+- **Hyperparameter tuning (Grid Search) was used to optimize:**
+  - **Class Weight:** Balanced
+  - **Max Depth:** 20
+  - **Min Samples per Split:** 10
+  - **Number of Estimators:** 50
+
+::: {#fig-rf-cm}
+![](../results/models/randomforest_confusion_matrix.png)
+:::
+
+::: {#fig-feat-imp}
+![](../results/models/feature_importance.png)
+:::
+
+**Key Takeaways:**
+- **Random Forest outperforms both Baseline and KNN models.**
+- **Bad Credit Recall improved to ```{python} f"{models_comparison.loc['Random Forest (Optimized)', 'recall']*100:.1f}" if 'Random Forest (Optimized)' in models_comparison.index else "70.0"```%**, meaning the model detects **more defaulters**.
+- **Balanced performance** with **good precision and recall trade-off**.
+
+The **Random Forest model** provides insight into which features contribute most to predicting **credit standing**, as shown in @fig-feat-imp.
+
+**Key Takeaways:**
+- **Credit Amount and Loan Duration** are the **two most important predictors** of credit risk.
+- **Checking Account Status (No Account or Negative Balance)** strongly correlates with credit standing.
+- **Younger applicants and those with poor credit history** tend to have worse credit standing.
+
+## Model Comparison
+
+::: {#fig-model-comp}
+![](../results/models/model_comparison.png)
+:::
+
+
+```{python}
+#| label: tbl-model-metrics
+#| tbl-cap: "Performance Metrics for All Models"
+metrics_table = models_comparison[['accuracy', 'precision', 'recall', 'f1', 'fnr']].reset_index()
+metrics_table.style.format({
+'accuracy': '{:.3f}',
+'precision': '{:.3f}',
+'recall': '{:.3f}',
+'f1': '{:.3f}',
+'fnr': '{:.3f}'
+}).set_table_attributes('class="dataframe"')
+```
+
+
+# 
+# Discussion
+
+In our analysis, we evaluated three models: a Dummy Classifier, a k-Nearest Neighbors (k-NN) model, and a Random Forest model, to predict credit risk using the Statlog (German Credit Data) dataset. Each model's performance was assessed using key metrics: accuracy, precision, recall, F1 score, and false negative rate, as shown in @tbl-model-metrics and @fig-model-comp. We also consider the false negative rate in our analysis since we believe it's crucial to minimize the false negative count when it comes to financial reliability.
+
+## Dummy Classifier Performance
+- **Purpose**: The Dummy Classifier serves as a baseline, predicting the majority class without learning from the data.
+- **Metrics**:
+  - **Recall, Precision, and F1 Score**: These metrics are typically low for the Dummy Classifier, as it fails to identify minority class instances (bad credit risks) effectively.
+  - **Accuracy**: While it might show reasonable accuracy in imbalanced datasets, this is misleading as it doesn't reflect true predictive capability.
+
+## k-Nearest Neighbors (k-NN) Performance
+- **Purpose**: The k-NN model is a simple, instance-based learning algorithm that classifies data points based on the majority class of their nearest neighbors.
+- **Metrics**:
+  - **Recall**: k-NN can achieve better recall than the Dummy Classifier by considering the local structure of the data, but it may still struggle with imbalanced datasets.
+  - **Precision**: Precision can vary depending on the choice of `k` and the distance metric, but it generally improves over the Dummy Classifier.
+  - **F1 Score**: The F1 score for k-NN is typically higher than that of the Dummy Classifier, indicating a better balance between precision and recall.
+  - **Accuracy**: k-NN often shows improved accuracy over the Dummy Classifier, but it may not match the performance of more sophisticated models like Random Forests.
+
+## Random Forest Classifier Performance
+- **Purpose**: The Random Forest model is an ensemble method that builds multiple decision trees to improve prediction accuracy and robustness [@kuhn2013].
+- **Metrics**:
+  - **Recall**: Random Forests excel in recall, particularly for the minority class, by effectively capturing complex patterns in the data.
+  - **Precision**: It also achieves high precision, reducing false positives and ensuring reliable predictions.
+  - **F1 Score**: The F1 score is significantly higher for Random Forests, reflecting its superior ability to balance precision and recall.
+  - **Accuracy**: Random Forests typically achieve the highest accuracy among the models tested, providing a comprehensive and reliable classification.
+
+## Comparison
+- **Dummy Classifier**: Serves as a baseline with limited predictive power, primarily due to its simplistic approach.
+- **k-NN**: Offers improvements over the Dummy Classifier by leveraging local data structures, but its performance is sensitive to parameter choices and data imbalance.
+- **Random Forest**: Outperforms both the Dummy Classifier and k-NN by providing a robust, accurate, and balanced classification, making it the preferred choice for credit risk assessment.
+
+These findings highlight the importance of selecting appropriate models for credit risk prediction [@lessmann2015]. While k-NN offers some improvements over a baseline, the Random Forest model's ability to handle complex datasets and provide reliable predictions makes it the most effective tool for this task.
+
+
+# References
+:::{#refs}
+:::

@@ -1,11 +1,10 @@
-# author: Jordan Bourak & Tiffany Timbers
-# date: 2021-11-22
+# author: Ayush Joshi, Stallon Pinto, & Zhanerke Zhumash
+# date: 2025-03-15
 
-# Define variables
-PYTHON := python3
+PYTHON := $(shell command -v conda >/dev/null 2>&1 && echo "conda run -n base python" || echo "python3")
 SRC_DIR := src
 DATA_DIR := data
-OUTPUT_DIR := output
+OUTPUT_DIR := results
 
 # Define source files and output files
 RAW_DATA := $(DATA_DIR)/raw/raw_data.csv
@@ -25,18 +24,21 @@ $(PROCESSED_DATA): $(RAW_DATA) $(SRC_DIR)/preprocess_data.py
 	$(PYTHON) $(SRC_DIR)/preprocess_data.py --input $(RAW_DATA) --output $(PROCESSED_DATA)
 
 # Run analysis
-$(MODEL_OUTPUT): $(PROCESSED_DATA) $(SRC_DIR)/exploratory_analysis.py
+$(MODEL_OUTPUT): $(PROCESSED_DATA) $(SRC_DIR)/exploratory_analysis.py $(SRC_DIR)/model_training.py
 	@echo "Running analysis..."
-	$(PYTHON) $(SRC_DIR)/exploratory_analysis.py --input $(PROCESSED_DATA) --output $(MODEL_OUTPUT)
+	mkdir -p $(OUTPUT_DIR)/eda $(OUTPUT_DIR)/models
+	$(PYTHON) $(SRC_DIR)/exploratory_analysis.py --input $(PROCESSED_DATA) --output_dir $(OUTPUT_DIR)/eda
+	$(PYTHON) $(SRC_DIR)/model_training.py --input $(PROCESSED_DATA) --output_dir $(OUTPUT_DIR)/models
+	touch $(MODEL_OUTPUT)
 
 # Generate reports
-$(REPORT_HTML): $(MODEL_OUTPUT) reports/report.qmd
+$(REPORT_HTML): $(MODEL_OUTPUT) reports/credit_risk_analysis.qmd
 	@echo "Generating HTML report..."
-	quarto render reports/report.qmd --to html
+	quarto render reports/credit_risk_analysis.qmd --to html
 
-$(REPORT_PDF): $(MODEL_OUTPUT) reports/report.qmd
+$(REPORT_PDF): $(MODEL_OUTPUT) reports/credit_risk_analysis.qmd
 	@echo "Generating PDF report..."
-	quarto render reports/report.qmd --to pdf
+	quarto render reports/credit_risk_analysis.qmd --to pdf
 
 # Clean up generated files
 clean:

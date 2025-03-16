@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Ayush Joshi, Stallon Pinto, &amp; Zhanerke Zhumash">
+
+<title>Credit Risk Prediction: Analyzing Loan Applicant Risk Based on Demographic and Financial Attributes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="credit_risk_analysis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="credit_risk_analysis_files/libs/quarto-html/quarto.js"></script>
+<script src="credit_risk_analysis_files/libs/quarto-html/popper.min.js"></script>
+<script src="credit_risk_analysis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="credit_risk_analysis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="credit_risk_analysis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="credit_risk_analysis_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="credit_risk_analysis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="credit_risk_analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="credit_risk_analysis_files/libs/bootstrap/bootstrap-10daa034703793678e481cc8cee6d76f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#summary" id="toc-summary" class="nav-link active" data-scroll-target="#summary"><span class="header-section-number">1</span> Summary</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction"><span class="header-section-number">2</span> Introduction</a>
+  <ul class="collapse">
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background"><span class="header-section-number">2.1</span> Background</a></li>
+  <li><a href="#research-question" id="toc-research-question" class="nav-link" data-scroll-target="#research-question"><span class="header-section-number">2.2</span> Research Question</a></li>
+  <li><a href="#dataset-german-credit-data" id="toc-dataset-german-credit-data" class="nav-link" data-scroll-target="#dataset-german-credit-data"><span class="header-section-number">2.3</span> Dataset: German Credit Data</a>
+  <ul class="collapse">
+  <li><a href="#target-variable-credit-standing" id="toc-target-variable-credit-standing" class="nav-link" data-scroll-target="#target-variable-credit-standing"><span class="header-section-number">2.3.1</span> Target Variable (Credit Standing)</a></li>
+  <li><a href="#key-features" id="toc-key-features" class="nav-link" data-scroll-target="#key-features"><span class="header-section-number">2.3.2</span> Key Features</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#methods-results" id="toc-methods-results" class="nav-link" data-scroll-target="#methods-results"><span class="header-section-number">3</span> Methods &amp; Results</a>
+  <ul class="collapse">
+  <li><a href="#data-preprocessing" id="toc-data-preprocessing" class="nav-link" data-scroll-target="#data-preprocessing"><span class="header-section-number">3.1</span> Data Preprocessing</a>
+  <ul class="collapse">
+  <li><a href="#loading-and-cleaning-the-data" id="toc-loading-and-cleaning-the-data" class="nav-link" data-scroll-target="#loading-and-cleaning-the-data"><span class="header-section-number">3.1.1</span> Loading and Cleaning the Data</a></li>
+  </ul></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis"><span class="header-section-number">3.2</span> Exploratory Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#correlation-analysis" id="toc-correlation-analysis" class="nav-link" data-scroll-target="#correlation-analysis"><span class="header-section-number">3.2.1</span> Correlation Analysis</a></li>
+  </ul></li>
+  <li><a href="#feature-distributions" id="toc-feature-distributions" class="nav-link" data-scroll-target="#feature-distributions"><span class="header-section-number">3.3</span> <strong>Feature Distributions</strong></a></li>
+  <li><a href="#model-performance-analysis" id="toc-model-performance-analysis" class="nav-link" data-scroll-target="#model-performance-analysis"><span class="header-section-number">3.4</span> Model Performance Analysis</a>
+  <ul class="collapse">
+  <li><a href="#baseline-model-majority-class-classifier" id="toc-baseline-model-majority-class-classifier" class="nav-link" data-scroll-target="#baseline-model-majority-class-classifier"><span class="header-section-number">3.4.1</span> Baseline Model (Majority Class Classifier)</a></li>
+  <li><a href="#k-nearest-neighbors-optimized" id="toc-k-nearest-neighbors-optimized" class="nav-link" data-scroll-target="#k-nearest-neighbors-optimized"><span class="header-section-number">3.4.2</span> K-Nearest Neighbors (Optimized)</a></li>
+  <li><a href="#random-forest-optimized" id="toc-random-forest-optimized" class="nav-link" data-scroll-target="#random-forest-optimized"><span class="header-section-number">3.4.3</span> Random Forest (Optimized)</a></li>
+  </ul></li>
+  <li><a href="#model-comparison" id="toc-model-comparison" class="nav-link" data-scroll-target="#model-comparison"><span class="header-section-number">3.5</span> Model Comparison</a></li>
+  </ul></li>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"><span class="header-section-number">4</span> </a></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion"><span class="header-section-number">5</span> Discussion</a>
+  <ul class="collapse">
+  <li><a href="#dummy-classifier-performance" id="toc-dummy-classifier-performance" class="nav-link" data-scroll-target="#dummy-classifier-performance"><span class="header-section-number">5.1</span> Dummy Classifier Performance</a></li>
+  <li><a href="#k-nearest-neighbors-k-nn-performance" id="toc-k-nearest-neighbors-k-nn-performance" class="nav-link" data-scroll-target="#k-nearest-neighbors-k-nn-performance"><span class="header-section-number">5.2</span> k-Nearest Neighbors (k-NN) Performance</a></li>
+  <li><a href="#random-forest-classifier-performance" id="toc-random-forest-classifier-performance" class="nav-link" data-scroll-target="#random-forest-classifier-performance"><span class="header-section-number">5.3</span> Random Forest Classifier Performance</a></li>
+  <li><a href="#comparison" id="toc-comparison" class="nav-link" data-scroll-target="#comparison"><span class="header-section-number">5.4</span> Comparison</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">6</span> References</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="../credit_risk_analysis.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Credit Risk Prediction: Analyzing Loan Applicant Risk Based on Demographic and Financial Attributes</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Ayush Joshi, Stallon Pinto, &amp; Zhanerke Zhumash </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="summary" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Summary</h1>
+<p>This project aims to develop a predictive model to assess the credit risk of loan applicants using the Statlog (German Credit Data) dataset. The primary objective is to determine whether an applicant is a good or bad credit risk based on various demographic and financial attributes. We explored a few models and landed on a Random Forest classifier as it had the highest accuracy and was also able to minimize false negatives, which is crucial for reducing the risk of approving applicants with poor creditworthiness.</p>
+</section>
+<section id="introduction" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Introduction</h1>
+<section id="background" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="background"><span class="header-section-number">2.1</span> Background</h2>
+<p>Credit risk assessment is a crucial process in banking and financial services. Lenders evaluate borrowers based on financial stability and past credit behavior to determine their likelihood of defaulting on a loan. With the advancements in machine learning, automated credit risk assessment has gained traction as it can efficiently analyze large datasets, identify risk patterns, and improve lending decisions <span class="citation" data-cites="basel2001">(<a href="#ref-basel2001" role="doc-biblioref">Banking Supervision 2001</a>)</span>. This project explores whether a machine learning model can predict whether a loan applicant is a good or bad credit risk based on demographic and financial data.</p>
+</section>
+<section id="research-question" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="research-question"><span class="header-section-number">2.2</span> Research Question</h2>
+<p>Can we classify a loan applicant as a <strong>good</strong> or <strong>bad</strong> credit risk using a combination of <strong>demographic, financial, and loan-specific attributes</strong>?</p>
+</section>
+<section id="dataset-german-credit-data" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="dataset-german-credit-data"><span class="header-section-number">2.3</span> Dataset: German Credit Data</h2>
+<p>The dataset used in this analysis is the <strong>German Credit Dataset</strong>, originally compiled by <strong>Professor Dr.&nbsp;Hans Hofmann</strong> from <strong>Universität Hamburg</strong> <span class="citation" data-cites="statlog">(<a href="#ref-statlog" role="doc-biblioref"><span>“Statlog (German Credit Data) Dataset,”</span> n.d.</a>)</span>. It contains 1,000 instances with 20 attributes describing various aspects of a loan applicant’s financial and personal profile. The dataset has both categorical and numerical attributes and provides a labeled classification of good vs.&nbsp;bad credit risk.</p>
+<section id="target-variable-credit-standing" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="target-variable-credit-standing"><span class="header-section-number">2.3.1</span> Target Variable (Credit Standing)</h3>
+<ul>
+<li><strong>0</strong> → Good Credit Risk (low risk, likely to repay)</li>
+<li><strong>1</strong> → Bad Credit Risk (high risk, potential default)</li>
+</ul>
+</section>
+<section id="key-features" class="level3" data-number="2.3.2">
+<h3 data-number="2.3.2" class="anchored" data-anchor-id="key-features"><span class="header-section-number">2.3.2</span> Key Features</h3>
+<p>The dataset consists of three broad categories of features:</p>
+<ol type="1">
+<li><strong>Demographic Information:</strong>
+<ul>
+<li><strong>Age</strong> (numerical): The applicant’s age in years.</li>
+<li><strong>Employment Status</strong> (categorical): The applicant’s work experience categorized into different groups.</li>
+<li><strong>Foreign Worker Status</strong> (categorical): Whether the applicant is a foreign worker (Yes/No).</li>
+<li><strong>Personal Status &amp; Gender</strong> (categorical): Applicant’s marital status and gender.</li>
+</ul></li>
+<li><strong>Financial Attributes:</strong>
+<ul>
+<li><strong>Credit History</strong> (categorical): Previous credit behavior (e.g., no previous credit, delayed payments, fully repaid).</li>
+<li><strong>Status of Checking Account</strong> (categorical): Information on the applicant’s checking account balance.</li>
+<li><strong>Savings Account/Bonds</strong> (categorical): Level of savings held by the applicant.</li>
+<li><strong>Credit Amount</strong> (numerical): The total loan amount requested.</li>
+<li><strong>Other Debtors/Guarantors</strong> (categorical): Whether the applicant has co-applicants or guarantors.</li>
+</ul></li>
+<li><strong>Loan &amp; Payment Behavior:</strong>
+<ul>
+<li><strong>Loan Purpose</strong> (categorical): The purpose for which the loan is requested (e.g., car, education, business).</li>
+<li><strong>Loan Duration (Months)</strong> (numerical): The length of the loan term.</li>
+<li><strong>Installment Rate</strong> (numerical): Loan repayment amount as a percentage of disposable income.</li>
+<li><strong>Existing Credits at Bank</strong> (numerical): The number of current outstanding loans with the bank.</li>
+<li><strong>Other Installment Plans</strong> (categorical): Whether the applicant has other loans with banks or stores.</li>
+<li><strong>Housing Status</strong> (categorical): Whether the applicant owns, rents, or lives rent-free.</li>
+</ul></li>
+</ol>
+</section>
+</section>
+</section>
+<section id="methods-results" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Methods &amp; Results</h1>
+<p>This section outlines the step-by-step methodology used to preprocess the dataset, perform exploratory data analysis (EDA), and build machine learning models for credit risk classification.</p>
+<section id="data-preprocessing" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="data-preprocessing"><span class="header-section-number">3.1</span> Data Preprocessing</h2>
+<section id="loading-and-cleaning-the-data" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="loading-and-cleaning-the-data"><span class="header-section-number">3.1.1</span> Loading and Cleaning the Data</h3>
+<ul>
+<li>The dataset was loaded from online.</li>
+<li>Column names were <strong>added to the dataset</strong> for readability.</li>
+<li><strong>Ambiguous categorical feature names</strong> were mapped to <strong>interpretable labels</strong> for improved understanding.</li>
+</ul>
+<div class="cell" data-execution_count="2">
+<div id="tbl-raw-data" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="2">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-raw-data-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Processed German Credit Data (First 5 Rows)
+</figcaption>
+<div aria-describedby="tbl-raw-data-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display" data-execution_count="4">
+
+
+<table id="T_dab0c" class="dataframe do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_dab0c_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">Duration (in months)</th>
+<th id="T_dab0c_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">Credit_Amount</th>
+<th id="T_dab0c_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">Installment_Rate</th>
+<th id="T_dab0c_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">Residence_Since</th>
+<th id="T_dab0c_level0_col4" class="col_heading level0 col4" data-quarto-table-cell-role="th">Age</th>
+<th id="T_dab0c_level0_col5" class="col_heading level0 col5" data-quarto-table-cell-role="th">Existing_Credits</th>
+<th id="T_dab0c_level0_col6" class="col_heading level0 col6" data-quarto-table-cell-role="th">Num_People_Maintained</th>
+<th id="T_dab0c_level0_col7" class="col_heading level0 col7" data-quarto-table-cell-role="th">Credit Standing</th>
+<th id="T_dab0c_level0_col8" class="col_heading level0 col8" data-quarto-table-cell-role="th">Checking_Acc_Status_&lt; 0 DM</th>
+<th id="T_dab0c_level0_col9" class="col_heading level0 col9" data-quarto-table-cell-role="th">Checking_Acc_Status_&gt;= 200 DM or Salary Assigned</th>
+<th id="T_dab0c_level0_col10" class="col_heading level0 col10" data-quarto-table-cell-role="th">Checking_Acc_Status_No Checking Account</th>
+<th id="T_dab0c_level0_col11" class="col_heading level0 col11" data-quarto-table-cell-role="th">Credit_History_All Paid (Same Bank)</th>
+<th id="T_dab0c_level0_col12" class="col_heading level0 col12" data-quarto-table-cell-role="th">Credit_History_Critical Account / Other Existing Credits</th>
+<th id="T_dab0c_level0_col13" class="col_heading level0 col13" data-quarto-table-cell-role="th">Credit_History_No Credit Taken / All Paid</th>
+<th id="T_dab0c_level0_col14" class="col_heading level0 col14" data-quarto-table-cell-role="th">Credit_History_Past Delays in Payment</th>
+<th id="T_dab0c_level0_col15" class="col_heading level0 col15" data-quarto-table-cell-role="th">Purpose_Domestic Appliances</th>
+<th id="T_dab0c_level0_col16" class="col_heading level0 col16" data-quarto-table-cell-role="th">Purpose_Education</th>
+<th id="T_dab0c_level0_col17" class="col_heading level0 col17" data-quarto-table-cell-role="th">Purpose_Furniture/Equipment</th>
+<th id="T_dab0c_level0_col18" class="col_heading level0 col18" data-quarto-table-cell-role="th">Purpose_New Car</th>
+<th id="T_dab0c_level0_col19" class="col_heading level0 col19" data-quarto-table-cell-role="th">Purpose_Others</th>
+<th id="T_dab0c_level0_col20" class="col_heading level0 col20" data-quarto-table-cell-role="th">Purpose_Radio/TV</th>
+<th id="T_dab0c_level0_col21" class="col_heading level0 col21" data-quarto-table-cell-role="th">Purpose_Repairs</th>
+<th id="T_dab0c_level0_col22" class="col_heading level0 col22" data-quarto-table-cell-role="th">Purpose_Retraining</th>
+<th id="T_dab0c_level0_col23" class="col_heading level0 col23" data-quarto-table-cell-role="th">Purpose_Used Car</th>
+<th id="T_dab0c_level0_col24" class="col_heading level0 col24" data-quarto-table-cell-role="th">Savings_Acc_500-1000 DM</th>
+<th id="T_dab0c_level0_col25" class="col_heading level0 col25" data-quarto-table-cell-role="th">Savings_Acc_&lt; 100 DM</th>
+<th id="T_dab0c_level0_col26" class="col_heading level0 col26" data-quarto-table-cell-role="th">Savings_Acc_&gt;= 1000 DM</th>
+<th id="T_dab0c_level0_col27" class="col_heading level0 col27" data-quarto-table-cell-role="th">Savings_Acc_No Savings Account</th>
+<th id="T_dab0c_level0_col28" class="col_heading level0 col28" data-quarto-table-cell-role="th">Employment_4-7 Years</th>
+<th id="T_dab0c_level0_col29" class="col_heading level0 col29" data-quarto-table-cell-role="th">Employment_&lt; 1 Year</th>
+<th id="T_dab0c_level0_col30" class="col_heading level0 col30" data-quarto-table-cell-role="th">Employment_&gt;= 7 Years</th>
+<th id="T_dab0c_level0_col31" class="col_heading level0 col31" data-quarto-table-cell-role="th">Employment_Unemployed</th>
+<th id="T_dab0c_level0_col32" class="col_heading level0 col32" data-quarto-table-cell-role="th">Personal_Status_Male: Divorced/Separated</th>
+<th id="T_dab0c_level0_col33" class="col_heading level0 col33" data-quarto-table-cell-role="th">Personal_Status_Male: Married/Widowed</th>
+<th id="T_dab0c_level0_col34" class="col_heading level0 col34" data-quarto-table-cell-role="th">Personal_Status_Male: Single</th>
+<th id="T_dab0c_level0_col35" class="col_heading level0 col35" data-quarto-table-cell-role="th">Other_Debtors_Guarantor</th>
+<th id="T_dab0c_level0_col36" class="col_heading level0 col36" data-quarto-table-cell-role="th">Other_Debtors_None</th>
+<th id="T_dab0c_level0_col37" class="col_heading level0 col37" data-quarto-table-cell-role="th">Property_Car or Other Property</th>
+<th id="T_dab0c_level0_col38" class="col_heading level0 col38" data-quarto-table-cell-role="th">Property_No Property</th>
+<th id="T_dab0c_level0_col39" class="col_heading level0 col39" data-quarto-table-cell-role="th">Property_Real Estate</th>
+<th id="T_dab0c_level0_col40" class="col_heading level0 col40" data-quarto-table-cell-role="th">Other_Installment_None</th>
+<th id="T_dab0c_level0_col41" class="col_heading level0 col41" data-quarto-table-cell-role="th">Other_Installment_Stores</th>
+<th id="T_dab0c_level0_col42" class="col_heading level0 col42" data-quarto-table-cell-role="th">Housing_Own</th>
+<th id="T_dab0c_level0_col43" class="col_heading level0 col43" data-quarto-table-cell-role="th">Housing_Rent</th>
+<th id="T_dab0c_level0_col44" class="col_heading level0 col44" data-quarto-table-cell-role="th">Job_Skilled Employee / Official</th>
+<th id="T_dab0c_level0_col45" class="col_heading level0 col45" data-quarto-table-cell-role="th">Job_Unemployed / Unskilled (Non-Resident)</th>
+<th id="T_dab0c_level0_col46" class="col_heading level0 col46" data-quarto-table-cell-role="th">Job_Unskilled (Resident)</th>
+<th id="T_dab0c_level0_col47" class="col_heading level0 col47" data-quarto-table-cell-role="th">Telephone_Yes, Registered</th>
+<th id="T_dab0c_level0_col48" class="col_heading level0 col48" data-quarto-table-cell-role="th">Foreign_Worker_Yes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td id="T_dab0c_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">0</td>
+<td id="T_dab0c_row0_col0" class="data row0 col0">6</td>
+<td id="T_dab0c_row0_col1" class="data row0 col1">1169</td>
+<td id="T_dab0c_row0_col2" class="data row0 col2">4</td>
+<td id="T_dab0c_row0_col3" class="data row0 col3">4</td>
+<td id="T_dab0c_row0_col4" class="data row0 col4">67</td>
+<td id="T_dab0c_row0_col5" class="data row0 col5">2</td>
+<td id="T_dab0c_row0_col6" class="data row0 col6">1</td>
+<td id="T_dab0c_row0_col7" class="data row0 col7">0</td>
+<td id="T_dab0c_row0_col8" class="data row0 col8">1</td>
+<td id="T_dab0c_row0_col9" class="data row0 col9">0</td>
+<td id="T_dab0c_row0_col10" class="data row0 col10">0</td>
+<td id="T_dab0c_row0_col11" class="data row0 col11">0</td>
+<td id="T_dab0c_row0_col12" class="data row0 col12">1</td>
+<td id="T_dab0c_row0_col13" class="data row0 col13">0</td>
+<td id="T_dab0c_row0_col14" class="data row0 col14">0</td>
+<td id="T_dab0c_row0_col15" class="data row0 col15">0</td>
+<td id="T_dab0c_row0_col16" class="data row0 col16">0</td>
+<td id="T_dab0c_row0_col17" class="data row0 col17">0</td>
+<td id="T_dab0c_row0_col18" class="data row0 col18">0</td>
+<td id="T_dab0c_row0_col19" class="data row0 col19">0</td>
+<td id="T_dab0c_row0_col20" class="data row0 col20">1</td>
+<td id="T_dab0c_row0_col21" class="data row0 col21">0</td>
+<td id="T_dab0c_row0_col22" class="data row0 col22">0</td>
+<td id="T_dab0c_row0_col23" class="data row0 col23">0</td>
+<td id="T_dab0c_row0_col24" class="data row0 col24">0</td>
+<td id="T_dab0c_row0_col25" class="data row0 col25">0</td>
+<td id="T_dab0c_row0_col26" class="data row0 col26">0</td>
+<td id="T_dab0c_row0_col27" class="data row0 col27">1</td>
+<td id="T_dab0c_row0_col28" class="data row0 col28">0</td>
+<td id="T_dab0c_row0_col29" class="data row0 col29">0</td>
+<td id="T_dab0c_row0_col30" class="data row0 col30">1</td>
+<td id="T_dab0c_row0_col31" class="data row0 col31">0</td>
+<td id="T_dab0c_row0_col32" class="data row0 col32">0</td>
+<td id="T_dab0c_row0_col33" class="data row0 col33">0</td>
+<td id="T_dab0c_row0_col34" class="data row0 col34">1</td>
+<td id="T_dab0c_row0_col35" class="data row0 col35">0</td>
+<td id="T_dab0c_row0_col36" class="data row0 col36">1</td>
+<td id="T_dab0c_row0_col37" class="data row0 col37">0</td>
+<td id="T_dab0c_row0_col38" class="data row0 col38">0</td>
+<td id="T_dab0c_row0_col39" class="data row0 col39">1</td>
+<td id="T_dab0c_row0_col40" class="data row0 col40">1</td>
+<td id="T_dab0c_row0_col41" class="data row0 col41">0</td>
+<td id="T_dab0c_row0_col42" class="data row0 col42">1</td>
+<td id="T_dab0c_row0_col43" class="data row0 col43">0</td>
+<td id="T_dab0c_row0_col44" class="data row0 col44">1</td>
+<td id="T_dab0c_row0_col45" class="data row0 col45">0</td>
+<td id="T_dab0c_row0_col46" class="data row0 col46">0</td>
+<td id="T_dab0c_row0_col47" class="data row0 col47">1</td>
+<td id="T_dab0c_row0_col48" class="data row0 col48">1</td>
+</tr>
+<tr class="even">
+<td id="T_dab0c_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">1</td>
+<td id="T_dab0c_row1_col0" class="data row1 col0">48</td>
+<td id="T_dab0c_row1_col1" class="data row1 col1">5951</td>
+<td id="T_dab0c_row1_col2" class="data row1 col2">2</td>
+<td id="T_dab0c_row1_col3" class="data row1 col3">2</td>
+<td id="T_dab0c_row1_col4" class="data row1 col4">22</td>
+<td id="T_dab0c_row1_col5" class="data row1 col5">1</td>
+<td id="T_dab0c_row1_col6" class="data row1 col6">1</td>
+<td id="T_dab0c_row1_col7" class="data row1 col7">1</td>
+<td id="T_dab0c_row1_col8" class="data row1 col8">0</td>
+<td id="T_dab0c_row1_col9" class="data row1 col9">0</td>
+<td id="T_dab0c_row1_col10" class="data row1 col10">0</td>
+<td id="T_dab0c_row1_col11" class="data row1 col11">0</td>
+<td id="T_dab0c_row1_col12" class="data row1 col12">0</td>
+<td id="T_dab0c_row1_col13" class="data row1 col13">0</td>
+<td id="T_dab0c_row1_col14" class="data row1 col14">0</td>
+<td id="T_dab0c_row1_col15" class="data row1 col15">0</td>
+<td id="T_dab0c_row1_col16" class="data row1 col16">0</td>
+<td id="T_dab0c_row1_col17" class="data row1 col17">0</td>
+<td id="T_dab0c_row1_col18" class="data row1 col18">0</td>
+<td id="T_dab0c_row1_col19" class="data row1 col19">0</td>
+<td id="T_dab0c_row1_col20" class="data row1 col20">1</td>
+<td id="T_dab0c_row1_col21" class="data row1 col21">0</td>
+<td id="T_dab0c_row1_col22" class="data row1 col22">0</td>
+<td id="T_dab0c_row1_col23" class="data row1 col23">0</td>
+<td id="T_dab0c_row1_col24" class="data row1 col24">0</td>
+<td id="T_dab0c_row1_col25" class="data row1 col25">1</td>
+<td id="T_dab0c_row1_col26" class="data row1 col26">0</td>
+<td id="T_dab0c_row1_col27" class="data row1 col27">0</td>
+<td id="T_dab0c_row1_col28" class="data row1 col28">0</td>
+<td id="T_dab0c_row1_col29" class="data row1 col29">0</td>
+<td id="T_dab0c_row1_col30" class="data row1 col30">0</td>
+<td id="T_dab0c_row1_col31" class="data row1 col31">0</td>
+<td id="T_dab0c_row1_col32" class="data row1 col32">0</td>
+<td id="T_dab0c_row1_col33" class="data row1 col33">0</td>
+<td id="T_dab0c_row1_col34" class="data row1 col34">0</td>
+<td id="T_dab0c_row1_col35" class="data row1 col35">0</td>
+<td id="T_dab0c_row1_col36" class="data row1 col36">1</td>
+<td id="T_dab0c_row1_col37" class="data row1 col37">0</td>
+<td id="T_dab0c_row1_col38" class="data row1 col38">0</td>
+<td id="T_dab0c_row1_col39" class="data row1 col39">1</td>
+<td id="T_dab0c_row1_col40" class="data row1 col40">1</td>
+<td id="T_dab0c_row1_col41" class="data row1 col41">0</td>
+<td id="T_dab0c_row1_col42" class="data row1 col42">1</td>
+<td id="T_dab0c_row1_col43" class="data row1 col43">0</td>
+<td id="T_dab0c_row1_col44" class="data row1 col44">1</td>
+<td id="T_dab0c_row1_col45" class="data row1 col45">0</td>
+<td id="T_dab0c_row1_col46" class="data row1 col46">0</td>
+<td id="T_dab0c_row1_col47" class="data row1 col47">0</td>
+<td id="T_dab0c_row1_col48" class="data row1 col48">1</td>
+</tr>
+<tr class="odd">
+<td id="T_dab0c_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">2</td>
+<td id="T_dab0c_row2_col0" class="data row2 col0">12</td>
+<td id="T_dab0c_row2_col1" class="data row2 col1">2096</td>
+<td id="T_dab0c_row2_col2" class="data row2 col2">2</td>
+<td id="T_dab0c_row2_col3" class="data row2 col3">3</td>
+<td id="T_dab0c_row2_col4" class="data row2 col4">49</td>
+<td id="T_dab0c_row2_col5" class="data row2 col5">1</td>
+<td id="T_dab0c_row2_col6" class="data row2 col6">2</td>
+<td id="T_dab0c_row2_col7" class="data row2 col7">0</td>
+<td id="T_dab0c_row2_col8" class="data row2 col8">0</td>
+<td id="T_dab0c_row2_col9" class="data row2 col9">0</td>
+<td id="T_dab0c_row2_col10" class="data row2 col10">1</td>
+<td id="T_dab0c_row2_col11" class="data row2 col11">0</td>
+<td id="T_dab0c_row2_col12" class="data row2 col12">1</td>
+<td id="T_dab0c_row2_col13" class="data row2 col13">0</td>
+<td id="T_dab0c_row2_col14" class="data row2 col14">0</td>
+<td id="T_dab0c_row2_col15" class="data row2 col15">0</td>
+<td id="T_dab0c_row2_col16" class="data row2 col16">1</td>
+<td id="T_dab0c_row2_col17" class="data row2 col17">0</td>
+<td id="T_dab0c_row2_col18" class="data row2 col18">0</td>
+<td id="T_dab0c_row2_col19" class="data row2 col19">0</td>
+<td id="T_dab0c_row2_col20" class="data row2 col20">0</td>
+<td id="T_dab0c_row2_col21" class="data row2 col21">0</td>
+<td id="T_dab0c_row2_col22" class="data row2 col22">0</td>
+<td id="T_dab0c_row2_col23" class="data row2 col23">0</td>
+<td id="T_dab0c_row2_col24" class="data row2 col24">0</td>
+<td id="T_dab0c_row2_col25" class="data row2 col25">1</td>
+<td id="T_dab0c_row2_col26" class="data row2 col26">0</td>
+<td id="T_dab0c_row2_col27" class="data row2 col27">0</td>
+<td id="T_dab0c_row2_col28" class="data row2 col28">1</td>
+<td id="T_dab0c_row2_col29" class="data row2 col29">0</td>
+<td id="T_dab0c_row2_col30" class="data row2 col30">0</td>
+<td id="T_dab0c_row2_col31" class="data row2 col31">0</td>
+<td id="T_dab0c_row2_col32" class="data row2 col32">0</td>
+<td id="T_dab0c_row2_col33" class="data row2 col33">0</td>
+<td id="T_dab0c_row2_col34" class="data row2 col34">1</td>
+<td id="T_dab0c_row2_col35" class="data row2 col35">0</td>
+<td id="T_dab0c_row2_col36" class="data row2 col36">1</td>
+<td id="T_dab0c_row2_col37" class="data row2 col37">0</td>
+<td id="T_dab0c_row2_col38" class="data row2 col38">0</td>
+<td id="T_dab0c_row2_col39" class="data row2 col39">1</td>
+<td id="T_dab0c_row2_col40" class="data row2 col40">1</td>
+<td id="T_dab0c_row2_col41" class="data row2 col41">0</td>
+<td id="T_dab0c_row2_col42" class="data row2 col42">1</td>
+<td id="T_dab0c_row2_col43" class="data row2 col43">0</td>
+<td id="T_dab0c_row2_col44" class="data row2 col44">0</td>
+<td id="T_dab0c_row2_col45" class="data row2 col45">0</td>
+<td id="T_dab0c_row2_col46" class="data row2 col46">1</td>
+<td id="T_dab0c_row2_col47" class="data row2 col47">0</td>
+<td id="T_dab0c_row2_col48" class="data row2 col48">1</td>
+</tr>
+<tr class="even">
+<td id="T_dab0c_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">3</td>
+<td id="T_dab0c_row3_col0" class="data row3 col0">42</td>
+<td id="T_dab0c_row3_col1" class="data row3 col1">7882</td>
+<td id="T_dab0c_row3_col2" class="data row3 col2">2</td>
+<td id="T_dab0c_row3_col3" class="data row3 col3">4</td>
+<td id="T_dab0c_row3_col4" class="data row3 col4">45</td>
+<td id="T_dab0c_row3_col5" class="data row3 col5">1</td>
+<td id="T_dab0c_row3_col6" class="data row3 col6">2</td>
+<td id="T_dab0c_row3_col7" class="data row3 col7">0</td>
+<td id="T_dab0c_row3_col8" class="data row3 col8">1</td>
+<td id="T_dab0c_row3_col9" class="data row3 col9">0</td>
+<td id="T_dab0c_row3_col10" class="data row3 col10">0</td>
+<td id="T_dab0c_row3_col11" class="data row3 col11">0</td>
+<td id="T_dab0c_row3_col12" class="data row3 col12">0</td>
+<td id="T_dab0c_row3_col13" class="data row3 col13">0</td>
+<td id="T_dab0c_row3_col14" class="data row3 col14">0</td>
+<td id="T_dab0c_row3_col15" class="data row3 col15">0</td>
+<td id="T_dab0c_row3_col16" class="data row3 col16">0</td>
+<td id="T_dab0c_row3_col17" class="data row3 col17">1</td>
+<td id="T_dab0c_row3_col18" class="data row3 col18">0</td>
+<td id="T_dab0c_row3_col19" class="data row3 col19">0</td>
+<td id="T_dab0c_row3_col20" class="data row3 col20">0</td>
+<td id="T_dab0c_row3_col21" class="data row3 col21">0</td>
+<td id="T_dab0c_row3_col22" class="data row3 col22">0</td>
+<td id="T_dab0c_row3_col23" class="data row3 col23">0</td>
+<td id="T_dab0c_row3_col24" class="data row3 col24">0</td>
+<td id="T_dab0c_row3_col25" class="data row3 col25">1</td>
+<td id="T_dab0c_row3_col26" class="data row3 col26">0</td>
+<td id="T_dab0c_row3_col27" class="data row3 col27">0</td>
+<td id="T_dab0c_row3_col28" class="data row3 col28">1</td>
+<td id="T_dab0c_row3_col29" class="data row3 col29">0</td>
+<td id="T_dab0c_row3_col30" class="data row3 col30">0</td>
+<td id="T_dab0c_row3_col31" class="data row3 col31">0</td>
+<td id="T_dab0c_row3_col32" class="data row3 col32">0</td>
+<td id="T_dab0c_row3_col33" class="data row3 col33">0</td>
+<td id="T_dab0c_row3_col34" class="data row3 col34">1</td>
+<td id="T_dab0c_row3_col35" class="data row3 col35">1</td>
+<td id="T_dab0c_row3_col36" class="data row3 col36">0</td>
+<td id="T_dab0c_row3_col37" class="data row3 col37">0</td>
+<td id="T_dab0c_row3_col38" class="data row3 col38">0</td>
+<td id="T_dab0c_row3_col39" class="data row3 col39">0</td>
+<td id="T_dab0c_row3_col40" class="data row3 col40">1</td>
+<td id="T_dab0c_row3_col41" class="data row3 col41">0</td>
+<td id="T_dab0c_row3_col42" class="data row3 col42">0</td>
+<td id="T_dab0c_row3_col43" class="data row3 col43">0</td>
+<td id="T_dab0c_row3_col44" class="data row3 col44">1</td>
+<td id="T_dab0c_row3_col45" class="data row3 col45">0</td>
+<td id="T_dab0c_row3_col46" class="data row3 col46">0</td>
+<td id="T_dab0c_row3_col47" class="data row3 col47">0</td>
+<td id="T_dab0c_row3_col48" class="data row3 col48">1</td>
+</tr>
+<tr class="odd">
+<td id="T_dab0c_level0_row4" class="row_heading level0 row4" data-quarto-table-cell-role="th">4</td>
+<td id="T_dab0c_row4_col0" class="data row4 col0">24</td>
+<td id="T_dab0c_row4_col1" class="data row4 col1">4870</td>
+<td id="T_dab0c_row4_col2" class="data row4 col2">3</td>
+<td id="T_dab0c_row4_col3" class="data row4 col3">4</td>
+<td id="T_dab0c_row4_col4" class="data row4 col4">53</td>
+<td id="T_dab0c_row4_col5" class="data row4 col5">2</td>
+<td id="T_dab0c_row4_col6" class="data row4 col6">2</td>
+<td id="T_dab0c_row4_col7" class="data row4 col7">1</td>
+<td id="T_dab0c_row4_col8" class="data row4 col8">1</td>
+<td id="T_dab0c_row4_col9" class="data row4 col9">0</td>
+<td id="T_dab0c_row4_col10" class="data row4 col10">0</td>
+<td id="T_dab0c_row4_col11" class="data row4 col11">0</td>
+<td id="T_dab0c_row4_col12" class="data row4 col12">0</td>
+<td id="T_dab0c_row4_col13" class="data row4 col13">0</td>
+<td id="T_dab0c_row4_col14" class="data row4 col14">1</td>
+<td id="T_dab0c_row4_col15" class="data row4 col15">0</td>
+<td id="T_dab0c_row4_col16" class="data row4 col16">0</td>
+<td id="T_dab0c_row4_col17" class="data row4 col17">0</td>
+<td id="T_dab0c_row4_col18" class="data row4 col18">1</td>
+<td id="T_dab0c_row4_col19" class="data row4 col19">0</td>
+<td id="T_dab0c_row4_col20" class="data row4 col20">0</td>
+<td id="T_dab0c_row4_col21" class="data row4 col21">0</td>
+<td id="T_dab0c_row4_col22" class="data row4 col22">0</td>
+<td id="T_dab0c_row4_col23" class="data row4 col23">0</td>
+<td id="T_dab0c_row4_col24" class="data row4 col24">0</td>
+<td id="T_dab0c_row4_col25" class="data row4 col25">1</td>
+<td id="T_dab0c_row4_col26" class="data row4 col26">0</td>
+<td id="T_dab0c_row4_col27" class="data row4 col27">0</td>
+<td id="T_dab0c_row4_col28" class="data row4 col28">0</td>
+<td id="T_dab0c_row4_col29" class="data row4 col29">0</td>
+<td id="T_dab0c_row4_col30" class="data row4 col30">0</td>
+<td id="T_dab0c_row4_col31" class="data row4 col31">0</td>
+<td id="T_dab0c_row4_col32" class="data row4 col32">0</td>
+<td id="T_dab0c_row4_col33" class="data row4 col33">0</td>
+<td id="T_dab0c_row4_col34" class="data row4 col34">1</td>
+<td id="T_dab0c_row4_col35" class="data row4 col35">0</td>
+<td id="T_dab0c_row4_col36" class="data row4 col36">1</td>
+<td id="T_dab0c_row4_col37" class="data row4 col37">0</td>
+<td id="T_dab0c_row4_col38" class="data row4 col38">1</td>
+<td id="T_dab0c_row4_col39" class="data row4 col39">0</td>
+<td id="T_dab0c_row4_col40" class="data row4 col40">1</td>
+<td id="T_dab0c_row4_col41" class="data row4 col41">0</td>
+<td id="T_dab0c_row4_col42" class="data row4 col42">0</td>
+<td id="T_dab0c_row4_col43" class="data row4 col43">0</td>
+<td id="T_dab0c_row4_col44" class="data row4 col44">1</td>
+<td id="T_dab0c_row4_col45" class="data row4 col45">0</td>
+<td id="T_dab0c_row4_col46" class="data row4 col46">0</td>
+<td id="T_dab0c_row4_col47" class="data row4 col47">0</td>
+<td id="T_dab0c_row4_col48" class="data row4 col48">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell" data-execution_count="3">
+<div id="tbl-mapped-data" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="3">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-mapped-data-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: German Credit Data with Mapped Values (First 5 Rows)
+</figcaption>
+<div aria-describedby="tbl-mapped-data-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display" data-execution_count="5">
+
+
+<table id="T_5a1f2" class="dataframe do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_5a1f2_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">Duration (in months)</th>
+<th id="T_5a1f2_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">Credit_Amount</th>
+<th id="T_5a1f2_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">Installment_Rate</th>
+<th id="T_5a1f2_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">Residence_Since</th>
+<th id="T_5a1f2_level0_col4" class="col_heading level0 col4" data-quarto-table-cell-role="th">Age</th>
+<th id="T_5a1f2_level0_col5" class="col_heading level0 col5" data-quarto-table-cell-role="th">Existing_Credits</th>
+<th id="T_5a1f2_level0_col6" class="col_heading level0 col6" data-quarto-table-cell-role="th">Num_People_Maintained</th>
+<th id="T_5a1f2_level0_col7" class="col_heading level0 col7" data-quarto-table-cell-role="th">Credit Standing</th>
+<th id="T_5a1f2_level0_col8" class="col_heading level0 col8" data-quarto-table-cell-role="th">Checking_Acc_Status_&lt; 0 DM</th>
+<th id="T_5a1f2_level0_col9" class="col_heading level0 col9" data-quarto-table-cell-role="th">Checking_Acc_Status_&gt;= 200 DM or Salary Assigned</th>
+<th id="T_5a1f2_level0_col10" class="col_heading level0 col10" data-quarto-table-cell-role="th">Checking_Acc_Status_No Checking Account</th>
+<th id="T_5a1f2_level0_col11" class="col_heading level0 col11" data-quarto-table-cell-role="th">Credit_History_All Paid (Same Bank)</th>
+<th id="T_5a1f2_level0_col12" class="col_heading level0 col12" data-quarto-table-cell-role="th">Credit_History_Critical Account / Other Existing Credits</th>
+<th id="T_5a1f2_level0_col13" class="col_heading level0 col13" data-quarto-table-cell-role="th">Credit_History_No Credit Taken / All Paid</th>
+<th id="T_5a1f2_level0_col14" class="col_heading level0 col14" data-quarto-table-cell-role="th">Credit_History_Past Delays in Payment</th>
+<th id="T_5a1f2_level0_col15" class="col_heading level0 col15" data-quarto-table-cell-role="th">Purpose_Domestic Appliances</th>
+<th id="T_5a1f2_level0_col16" class="col_heading level0 col16" data-quarto-table-cell-role="th">Purpose_Education</th>
+<th id="T_5a1f2_level0_col17" class="col_heading level0 col17" data-quarto-table-cell-role="th">Purpose_Furniture/Equipment</th>
+<th id="T_5a1f2_level0_col18" class="col_heading level0 col18" data-quarto-table-cell-role="th">Purpose_New Car</th>
+<th id="T_5a1f2_level0_col19" class="col_heading level0 col19" data-quarto-table-cell-role="th">Purpose_Others</th>
+<th id="T_5a1f2_level0_col20" class="col_heading level0 col20" data-quarto-table-cell-role="th">Purpose_Radio/TV</th>
+<th id="T_5a1f2_level0_col21" class="col_heading level0 col21" data-quarto-table-cell-role="th">Purpose_Repairs</th>
+<th id="T_5a1f2_level0_col22" class="col_heading level0 col22" data-quarto-table-cell-role="th">Purpose_Retraining</th>
+<th id="T_5a1f2_level0_col23" class="col_heading level0 col23" data-quarto-table-cell-role="th">Purpose_Used Car</th>
+<th id="T_5a1f2_level0_col24" class="col_heading level0 col24" data-quarto-table-cell-role="th">Savings_Acc_500-1000 DM</th>
+<th id="T_5a1f2_level0_col25" class="col_heading level0 col25" data-quarto-table-cell-role="th">Savings_Acc_&lt; 100 DM</th>
+<th id="T_5a1f2_level0_col26" class="col_heading level0 col26" data-quarto-table-cell-role="th">Savings_Acc_&gt;= 1000 DM</th>
+<th id="T_5a1f2_level0_col27" class="col_heading level0 col27" data-quarto-table-cell-role="th">Savings_Acc_No Savings Account</th>
+<th id="T_5a1f2_level0_col28" class="col_heading level0 col28" data-quarto-table-cell-role="th">Employment_4-7 Years</th>
+<th id="T_5a1f2_level0_col29" class="col_heading level0 col29" data-quarto-table-cell-role="th">Employment_&lt; 1 Year</th>
+<th id="T_5a1f2_level0_col30" class="col_heading level0 col30" data-quarto-table-cell-role="th">Employment_&gt;= 7 Years</th>
+<th id="T_5a1f2_level0_col31" class="col_heading level0 col31" data-quarto-table-cell-role="th">Employment_Unemployed</th>
+<th id="T_5a1f2_level0_col32" class="col_heading level0 col32" data-quarto-table-cell-role="th">Personal_Status_Male: Divorced/Separated</th>
+<th id="T_5a1f2_level0_col33" class="col_heading level0 col33" data-quarto-table-cell-role="th">Personal_Status_Male: Married/Widowed</th>
+<th id="T_5a1f2_level0_col34" class="col_heading level0 col34" data-quarto-table-cell-role="th">Personal_Status_Male: Single</th>
+<th id="T_5a1f2_level0_col35" class="col_heading level0 col35" data-quarto-table-cell-role="th">Other_Debtors_Guarantor</th>
+<th id="T_5a1f2_level0_col36" class="col_heading level0 col36" data-quarto-table-cell-role="th">Other_Debtors_None</th>
+<th id="T_5a1f2_level0_col37" class="col_heading level0 col37" data-quarto-table-cell-role="th">Property_Car or Other Property</th>
+<th id="T_5a1f2_level0_col38" class="col_heading level0 col38" data-quarto-table-cell-role="th">Property_No Property</th>
+<th id="T_5a1f2_level0_col39" class="col_heading level0 col39" data-quarto-table-cell-role="th">Property_Real Estate</th>
+<th id="T_5a1f2_level0_col40" class="col_heading level0 col40" data-quarto-table-cell-role="th">Other_Installment_None</th>
+<th id="T_5a1f2_level0_col41" class="col_heading level0 col41" data-quarto-table-cell-role="th">Other_Installment_Stores</th>
+<th id="T_5a1f2_level0_col42" class="col_heading level0 col42" data-quarto-table-cell-role="th">Housing_Own</th>
+<th id="T_5a1f2_level0_col43" class="col_heading level0 col43" data-quarto-table-cell-role="th">Housing_Rent</th>
+<th id="T_5a1f2_level0_col44" class="col_heading level0 col44" data-quarto-table-cell-role="th">Job_Skilled Employee / Official</th>
+<th id="T_5a1f2_level0_col45" class="col_heading level0 col45" data-quarto-table-cell-role="th">Job_Unemployed / Unskilled (Non-Resident)</th>
+<th id="T_5a1f2_level0_col46" class="col_heading level0 col46" data-quarto-table-cell-role="th">Job_Unskilled (Resident)</th>
+<th id="T_5a1f2_level0_col47" class="col_heading level0 col47" data-quarto-table-cell-role="th">Telephone_Yes, Registered</th>
+<th id="T_5a1f2_level0_col48" class="col_heading level0 col48" data-quarto-table-cell-role="th">Foreign_Worker_Yes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td id="T_5a1f2_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">0</td>
+<td id="T_5a1f2_row0_col0" class="data row0 col0">6</td>
+<td id="T_5a1f2_row0_col1" class="data row0 col1">1169</td>
+<td id="T_5a1f2_row0_col2" class="data row0 col2">4</td>
+<td id="T_5a1f2_row0_col3" class="data row0 col3">4</td>
+<td id="T_5a1f2_row0_col4" class="data row0 col4">67</td>
+<td id="T_5a1f2_row0_col5" class="data row0 col5">2</td>
+<td id="T_5a1f2_row0_col6" class="data row0 col6">1</td>
+<td id="T_5a1f2_row0_col7" class="data row0 col7">0</td>
+<td id="T_5a1f2_row0_col8" class="data row0 col8">1</td>
+<td id="T_5a1f2_row0_col9" class="data row0 col9">0</td>
+<td id="T_5a1f2_row0_col10" class="data row0 col10">0</td>
+<td id="T_5a1f2_row0_col11" class="data row0 col11">0</td>
+<td id="T_5a1f2_row0_col12" class="data row0 col12">1</td>
+<td id="T_5a1f2_row0_col13" class="data row0 col13">0</td>
+<td id="T_5a1f2_row0_col14" class="data row0 col14">0</td>
+<td id="T_5a1f2_row0_col15" class="data row0 col15">0</td>
+<td id="T_5a1f2_row0_col16" class="data row0 col16">0</td>
+<td id="T_5a1f2_row0_col17" class="data row0 col17">0</td>
+<td id="T_5a1f2_row0_col18" class="data row0 col18">0</td>
+<td id="T_5a1f2_row0_col19" class="data row0 col19">0</td>
+<td id="T_5a1f2_row0_col20" class="data row0 col20">1</td>
+<td id="T_5a1f2_row0_col21" class="data row0 col21">0</td>
+<td id="T_5a1f2_row0_col22" class="data row0 col22">0</td>
+<td id="T_5a1f2_row0_col23" class="data row0 col23">0</td>
+<td id="T_5a1f2_row0_col24" class="data row0 col24">0</td>
+<td id="T_5a1f2_row0_col25" class="data row0 col25">0</td>
+<td id="T_5a1f2_row0_col26" class="data row0 col26">0</td>
+<td id="T_5a1f2_row0_col27" class="data row0 col27">1</td>
+<td id="T_5a1f2_row0_col28" class="data row0 col28">0</td>
+<td id="T_5a1f2_row0_col29" class="data row0 col29">0</td>
+<td id="T_5a1f2_row0_col30" class="data row0 col30">1</td>
+<td id="T_5a1f2_row0_col31" class="data row0 col31">0</td>
+<td id="T_5a1f2_row0_col32" class="data row0 col32">0</td>
+<td id="T_5a1f2_row0_col33" class="data row0 col33">0</td>
+<td id="T_5a1f2_row0_col34" class="data row0 col34">1</td>
+<td id="T_5a1f2_row0_col35" class="data row0 col35">0</td>
+<td id="T_5a1f2_row0_col36" class="data row0 col36">1</td>
+<td id="T_5a1f2_row0_col37" class="data row0 col37">0</td>
+<td id="T_5a1f2_row0_col38" class="data row0 col38">0</td>
+<td id="T_5a1f2_row0_col39" class="data row0 col39">1</td>
+<td id="T_5a1f2_row0_col40" class="data row0 col40">1</td>
+<td id="T_5a1f2_row0_col41" class="data row0 col41">0</td>
+<td id="T_5a1f2_row0_col42" class="data row0 col42">1</td>
+<td id="T_5a1f2_row0_col43" class="data row0 col43">0</td>
+<td id="T_5a1f2_row0_col44" class="data row0 col44">1</td>
+<td id="T_5a1f2_row0_col45" class="data row0 col45">0</td>
+<td id="T_5a1f2_row0_col46" class="data row0 col46">0</td>
+<td id="T_5a1f2_row0_col47" class="data row0 col47">1</td>
+<td id="T_5a1f2_row0_col48" class="data row0 col48">1</td>
+</tr>
+<tr class="even">
+<td id="T_5a1f2_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">1</td>
+<td id="T_5a1f2_row1_col0" class="data row1 col0">48</td>
+<td id="T_5a1f2_row1_col1" class="data row1 col1">5951</td>
+<td id="T_5a1f2_row1_col2" class="data row1 col2">2</td>
+<td id="T_5a1f2_row1_col3" class="data row1 col3">2</td>
+<td id="T_5a1f2_row1_col4" class="data row1 col4">22</td>
+<td id="T_5a1f2_row1_col5" class="data row1 col5">1</td>
+<td id="T_5a1f2_row1_col6" class="data row1 col6">1</td>
+<td id="T_5a1f2_row1_col7" class="data row1 col7">1</td>
+<td id="T_5a1f2_row1_col8" class="data row1 col8">0</td>
+<td id="T_5a1f2_row1_col9" class="data row1 col9">0</td>
+<td id="T_5a1f2_row1_col10" class="data row1 col10">0</td>
+<td id="T_5a1f2_row1_col11" class="data row1 col11">0</td>
+<td id="T_5a1f2_row1_col12" class="data row1 col12">0</td>
+<td id="T_5a1f2_row1_col13" class="data row1 col13">0</td>
+<td id="T_5a1f2_row1_col14" class="data row1 col14">0</td>
+<td id="T_5a1f2_row1_col15" class="data row1 col15">0</td>
+<td id="T_5a1f2_row1_col16" class="data row1 col16">0</td>
+<td id="T_5a1f2_row1_col17" class="data row1 col17">0</td>
+<td id="T_5a1f2_row1_col18" class="data row1 col18">0</td>
+<td id="T_5a1f2_row1_col19" class="data row1 col19">0</td>
+<td id="T_5a1f2_row1_col20" class="data row1 col20">1</td>
+<td id="T_5a1f2_row1_col21" class="data row1 col21">0</td>
+<td id="T_5a1f2_row1_col22" class="data row1 col22">0</td>
+<td id="T_5a1f2_row1_col23" class="data row1 col23">0</td>
+<td id="T_5a1f2_row1_col24" class="data row1 col24">0</td>
+<td id="T_5a1f2_row1_col25" class="data row1 col25">1</td>
+<td id="T_5a1f2_row1_col26" class="data row1 col26">0</td>
+<td id="T_5a1f2_row1_col27" class="data row1 col27">0</td>
+<td id="T_5a1f2_row1_col28" class="data row1 col28">0</td>
+<td id="T_5a1f2_row1_col29" class="data row1 col29">0</td>
+<td id="T_5a1f2_row1_col30" class="data row1 col30">0</td>
+<td id="T_5a1f2_row1_col31" class="data row1 col31">0</td>
+<td id="T_5a1f2_row1_col32" class="data row1 col32">0</td>
+<td id="T_5a1f2_row1_col33" class="data row1 col33">0</td>
+<td id="T_5a1f2_row1_col34" class="data row1 col34">0</td>
+<td id="T_5a1f2_row1_col35" class="data row1 col35">0</td>
+<td id="T_5a1f2_row1_col36" class="data row1 col36">1</td>
+<td id="T_5a1f2_row1_col37" class="data row1 col37">0</td>
+<td id="T_5a1f2_row1_col38" class="data row1 col38">0</td>
+<td id="T_5a1f2_row1_col39" class="data row1 col39">1</td>
+<td id="T_5a1f2_row1_col40" class="data row1 col40">1</td>
+<td id="T_5a1f2_row1_col41" class="data row1 col41">0</td>
+<td id="T_5a1f2_row1_col42" class="data row1 col42">1</td>
+<td id="T_5a1f2_row1_col43" class="data row1 col43">0</td>
+<td id="T_5a1f2_row1_col44" class="data row1 col44">1</td>
+<td id="T_5a1f2_row1_col45" class="data row1 col45">0</td>
+<td id="T_5a1f2_row1_col46" class="data row1 col46">0</td>
+<td id="T_5a1f2_row1_col47" class="data row1 col47">0</td>
+<td id="T_5a1f2_row1_col48" class="data row1 col48">1</td>
+</tr>
+<tr class="odd">
+<td id="T_5a1f2_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">2</td>
+<td id="T_5a1f2_row2_col0" class="data row2 col0">12</td>
+<td id="T_5a1f2_row2_col1" class="data row2 col1">2096</td>
+<td id="T_5a1f2_row2_col2" class="data row2 col2">2</td>
+<td id="T_5a1f2_row2_col3" class="data row2 col3">3</td>
+<td id="T_5a1f2_row2_col4" class="data row2 col4">49</td>
+<td id="T_5a1f2_row2_col5" class="data row2 col5">1</td>
+<td id="T_5a1f2_row2_col6" class="data row2 col6">2</td>
+<td id="T_5a1f2_row2_col7" class="data row2 col7">0</td>
+<td id="T_5a1f2_row2_col8" class="data row2 col8">0</td>
+<td id="T_5a1f2_row2_col9" class="data row2 col9">0</td>
+<td id="T_5a1f2_row2_col10" class="data row2 col10">1</td>
+<td id="T_5a1f2_row2_col11" class="data row2 col11">0</td>
+<td id="T_5a1f2_row2_col12" class="data row2 col12">1</td>
+<td id="T_5a1f2_row2_col13" class="data row2 col13">0</td>
+<td id="T_5a1f2_row2_col14" class="data row2 col14">0</td>
+<td id="T_5a1f2_row2_col15" class="data row2 col15">0</td>
+<td id="T_5a1f2_row2_col16" class="data row2 col16">1</td>
+<td id="T_5a1f2_row2_col17" class="data row2 col17">0</td>
+<td id="T_5a1f2_row2_col18" class="data row2 col18">0</td>
+<td id="T_5a1f2_row2_col19" class="data row2 col19">0</td>
+<td id="T_5a1f2_row2_col20" class="data row2 col20">0</td>
+<td id="T_5a1f2_row2_col21" class="data row2 col21">0</td>
+<td id="T_5a1f2_row2_col22" class="data row2 col22">0</td>
+<td id="T_5a1f2_row2_col23" class="data row2 col23">0</td>
+<td id="T_5a1f2_row2_col24" class="data row2 col24">0</td>
+<td id="T_5a1f2_row2_col25" class="data row2 col25">1</td>
+<td id="T_5a1f2_row2_col26" class="data row2 col26">0</td>
+<td id="T_5a1f2_row2_col27" class="data row2 col27">0</td>
+<td id="T_5a1f2_row2_col28" class="data row2 col28">1</td>
+<td id="T_5a1f2_row2_col29" class="data row2 col29">0</td>
+<td id="T_5a1f2_row2_col30" class="data row2 col30">0</td>
+<td id="T_5a1f2_row2_col31" class="data row2 col31">0</td>
+<td id="T_5a1f2_row2_col32" class="data row2 col32">0</td>
+<td id="T_5a1f2_row2_col33" class="data row2 col33">0</td>
+<td id="T_5a1f2_row2_col34" class="data row2 col34">1</td>
+<td id="T_5a1f2_row2_col35" class="data row2 col35">0</td>
+<td id="T_5a1f2_row2_col36" class="data row2 col36">1</td>
+<td id="T_5a1f2_row2_col37" class="data row2 col37">0</td>
+<td id="T_5a1f2_row2_col38" class="data row2 col38">0</td>
+<td id="T_5a1f2_row2_col39" class="data row2 col39">1</td>
+<td id="T_5a1f2_row2_col40" class="data row2 col40">1</td>
+<td id="T_5a1f2_row2_col41" class="data row2 col41">0</td>
+<td id="T_5a1f2_row2_col42" class="data row2 col42">1</td>
+<td id="T_5a1f2_row2_col43" class="data row2 col43">0</td>
+<td id="T_5a1f2_row2_col44" class="data row2 col44">0</td>
+<td id="T_5a1f2_row2_col45" class="data row2 col45">0</td>
+<td id="T_5a1f2_row2_col46" class="data row2 col46">1</td>
+<td id="T_5a1f2_row2_col47" class="data row2 col47">0</td>
+<td id="T_5a1f2_row2_col48" class="data row2 col48">1</td>
+</tr>
+<tr class="even">
+<td id="T_5a1f2_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">3</td>
+<td id="T_5a1f2_row3_col0" class="data row3 col0">42</td>
+<td id="T_5a1f2_row3_col1" class="data row3 col1">7882</td>
+<td id="T_5a1f2_row3_col2" class="data row3 col2">2</td>
+<td id="T_5a1f2_row3_col3" class="data row3 col3">4</td>
+<td id="T_5a1f2_row3_col4" class="data row3 col4">45</td>
+<td id="T_5a1f2_row3_col5" class="data row3 col5">1</td>
+<td id="T_5a1f2_row3_col6" class="data row3 col6">2</td>
+<td id="T_5a1f2_row3_col7" class="data row3 col7">0</td>
+<td id="T_5a1f2_row3_col8" class="data row3 col8">1</td>
+<td id="T_5a1f2_row3_col9" class="data row3 col9">0</td>
+<td id="T_5a1f2_row3_col10" class="data row3 col10">0</td>
+<td id="T_5a1f2_row3_col11" class="data row3 col11">0</td>
+<td id="T_5a1f2_row3_col12" class="data row3 col12">0</td>
+<td id="T_5a1f2_row3_col13" class="data row3 col13">0</td>
+<td id="T_5a1f2_row3_col14" class="data row3 col14">0</td>
+<td id="T_5a1f2_row3_col15" class="data row3 col15">0</td>
+<td id="T_5a1f2_row3_col16" class="data row3 col16">0</td>
+<td id="T_5a1f2_row3_col17" class="data row3 col17">1</td>
+<td id="T_5a1f2_row3_col18" class="data row3 col18">0</td>
+<td id="T_5a1f2_row3_col19" class="data row3 col19">0</td>
+<td id="T_5a1f2_row3_col20" class="data row3 col20">0</td>
+<td id="T_5a1f2_row3_col21" class="data row3 col21">0</td>
+<td id="T_5a1f2_row3_col22" class="data row3 col22">0</td>
+<td id="T_5a1f2_row3_col23" class="data row3 col23">0</td>
+<td id="T_5a1f2_row3_col24" class="data row3 col24">0</td>
+<td id="T_5a1f2_row3_col25" class="data row3 col25">1</td>
+<td id="T_5a1f2_row3_col26" class="data row3 col26">0</td>
+<td id="T_5a1f2_row3_col27" class="data row3 col27">0</td>
+<td id="T_5a1f2_row3_col28" class="data row3 col28">1</td>
+<td id="T_5a1f2_row3_col29" class="data row3 col29">0</td>
+<td id="T_5a1f2_row3_col30" class="data row3 col30">0</td>
+<td id="T_5a1f2_row3_col31" class="data row3 col31">0</td>
+<td id="T_5a1f2_row3_col32" class="data row3 col32">0</td>
+<td id="T_5a1f2_row3_col33" class="data row3 col33">0</td>
+<td id="T_5a1f2_row3_col34" class="data row3 col34">1</td>
+<td id="T_5a1f2_row3_col35" class="data row3 col35">1</td>
+<td id="T_5a1f2_row3_col36" class="data row3 col36">0</td>
+<td id="T_5a1f2_row3_col37" class="data row3 col37">0</td>
+<td id="T_5a1f2_row3_col38" class="data row3 col38">0</td>
+<td id="T_5a1f2_row3_col39" class="data row3 col39">0</td>
+<td id="T_5a1f2_row3_col40" class="data row3 col40">1</td>
+<td id="T_5a1f2_row3_col41" class="data row3 col41">0</td>
+<td id="T_5a1f2_row3_col42" class="data row3 col42">0</td>
+<td id="T_5a1f2_row3_col43" class="data row3 col43">0</td>
+<td id="T_5a1f2_row3_col44" class="data row3 col44">1</td>
+<td id="T_5a1f2_row3_col45" class="data row3 col45">0</td>
+<td id="T_5a1f2_row3_col46" class="data row3 col46">0</td>
+<td id="T_5a1f2_row3_col47" class="data row3 col47">0</td>
+<td id="T_5a1f2_row3_col48" class="data row3 col48">1</td>
+</tr>
+<tr class="odd">
+<td id="T_5a1f2_level0_row4" class="row_heading level0 row4" data-quarto-table-cell-role="th">4</td>
+<td id="T_5a1f2_row4_col0" class="data row4 col0">24</td>
+<td id="T_5a1f2_row4_col1" class="data row4 col1">4870</td>
+<td id="T_5a1f2_row4_col2" class="data row4 col2">3</td>
+<td id="T_5a1f2_row4_col3" class="data row4 col3">4</td>
+<td id="T_5a1f2_row4_col4" class="data row4 col4">53</td>
+<td id="T_5a1f2_row4_col5" class="data row4 col5">2</td>
+<td id="T_5a1f2_row4_col6" class="data row4 col6">2</td>
+<td id="T_5a1f2_row4_col7" class="data row4 col7">1</td>
+<td id="T_5a1f2_row4_col8" class="data row4 col8">1</td>
+<td id="T_5a1f2_row4_col9" class="data row4 col9">0</td>
+<td id="T_5a1f2_row4_col10" class="data row4 col10">0</td>
+<td id="T_5a1f2_row4_col11" class="data row4 col11">0</td>
+<td id="T_5a1f2_row4_col12" class="data row4 col12">0</td>
+<td id="T_5a1f2_row4_col13" class="data row4 col13">0</td>
+<td id="T_5a1f2_row4_col14" class="data row4 col14">1</td>
+<td id="T_5a1f2_row4_col15" class="data row4 col15">0</td>
+<td id="T_5a1f2_row4_col16" class="data row4 col16">0</td>
+<td id="T_5a1f2_row4_col17" class="data row4 col17">0</td>
+<td id="T_5a1f2_row4_col18" class="data row4 col18">1</td>
+<td id="T_5a1f2_row4_col19" class="data row4 col19">0</td>
+<td id="T_5a1f2_row4_col20" class="data row4 col20">0</td>
+<td id="T_5a1f2_row4_col21" class="data row4 col21">0</td>
+<td id="T_5a1f2_row4_col22" class="data row4 col22">0</td>
+<td id="T_5a1f2_row4_col23" class="data row4 col23">0</td>
+<td id="T_5a1f2_row4_col24" class="data row4 col24">0</td>
+<td id="T_5a1f2_row4_col25" class="data row4 col25">1</td>
+<td id="T_5a1f2_row4_col26" class="data row4 col26">0</td>
+<td id="T_5a1f2_row4_col27" class="data row4 col27">0</td>
+<td id="T_5a1f2_row4_col28" class="data row4 col28">0</td>
+<td id="T_5a1f2_row4_col29" class="data row4 col29">0</td>
+<td id="T_5a1f2_row4_col30" class="data row4 col30">0</td>
+<td id="T_5a1f2_row4_col31" class="data row4 col31">0</td>
+<td id="T_5a1f2_row4_col32" class="data row4 col32">0</td>
+<td id="T_5a1f2_row4_col33" class="data row4 col33">0</td>
+<td id="T_5a1f2_row4_col34" class="data row4 col34">1</td>
+<td id="T_5a1f2_row4_col35" class="data row4 col35">0</td>
+<td id="T_5a1f2_row4_col36" class="data row4 col36">1</td>
+<td id="T_5a1f2_row4_col37" class="data row4 col37">0</td>
+<td id="T_5a1f2_row4_col38" class="data row4 col38">1</td>
+<td id="T_5a1f2_row4_col39" class="data row4 col39">0</td>
+<td id="T_5a1f2_row4_col40" class="data row4 col40">1</td>
+<td id="T_5a1f2_row4_col41" class="data row4 col41">0</td>
+<td id="T_5a1f2_row4_col42" class="data row4 col42">0</td>
+<td id="T_5a1f2_row4_col43" class="data row4 col43">0</td>
+<td id="T_5a1f2_row4_col44" class="data row4 col44">1</td>
+<td id="T_5a1f2_row4_col45" class="data row4 col45">0</td>
+<td id="T_5a1f2_row4_col46" class="data row4 col46">0</td>
+<td id="T_5a1f2_row4_col47" class="data row4 col47">0</td>
+<td id="T_5a1f2_row4_col48" class="data row4 col48">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="exploratory-data-analysis" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="exploratory-data-analysis"><span class="header-section-number">3.2</span> Exploratory Data Analysis</h2>
+<p>The dataset contains <code>{python} len(df)</code> instances with <code>{python} len(df.columns)</code> attributes. Approximately <code>{python} f"{bad_credit_percentage:.1f}"</code>% of the applicants are classified as bad credit risks.</p>
+<div id="fig-credit-distribution" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-credit-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../results/eda/credit_standing_distribution.png" class="img-fluid figure-img" style="width:60.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-credit-distribution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: As shown in <a href="#fig-credit-distribution" class="quarto-xref">Figure&nbsp;1</a>, the dataset is imbalanced, with a majority of applicants having good credit standing. This imbalance is important to consider when building and evaluating our predictive models.
+</figcaption>
+</figure>
+</div>
+<section id="correlation-analysis" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="correlation-analysis"><span class="header-section-number">3.2.1</span> Correlation Analysis</h3>
+<p><a href="#tbl-correlations" class="quarto-xref">Table&nbsp;3</a> shows the top features correlated with credit standing. The strongest correlations are with checking account status, loan duration, and savings account status.</p>
+<div class="cell" data-execution_count="4">
+<div id="tbl-correlations" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="4">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-correlations-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Top 10 Features Correlated with Credit Standing
+</figcaption>
+<div aria-describedby="tbl-correlations-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display" data-execution_count="6">
+
+
+<table id="T_cb450" class="dataframe do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_cb450_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">Feature</th>
+<th id="T_cb450_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">Correlation with Credit Standing</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td id="T_cb450_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">0</td>
+<td id="T_cb450_row0_col0" class="data row0 col0">Checking_Acc_Status_&lt; 0 DM</td>
+<td id="T_cb450_row0_col1" class="data row0 col1">0.258</td>
+</tr>
+<tr class="even">
+<td id="T_cb450_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">1</td>
+<td id="T_cb450_row1_col0" class="data row1 col0">Duration (in months)</td>
+<td id="T_cb450_row1_col1" class="data row1 col1">0.215</td>
+</tr>
+<tr class="odd">
+<td id="T_cb450_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">2</td>
+<td id="T_cb450_row2_col0" class="data row2 col0">Savings_Acc_&lt; 100 DM</td>
+<td id="T_cb450_row2_col1" class="data row2 col1">0.161</td>
+</tr>
+<tr class="even">
+<td id="T_cb450_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">3</td>
+<td id="T_cb450_row3_col0" class="data row3 col0">Credit_Amount</td>
+<td id="T_cb450_row3_col1" class="data row3 col1">0.155</td>
+</tr>
+<tr class="odd">
+<td id="T_cb450_level0_row4" class="row_heading level0 row4" data-quarto-table-cell-role="th">4</td>
+<td id="T_cb450_row4_col0" class="data row4 col0">Credit_History_No Credit Taken / All Paid</td>
+<td id="T_cb450_row4_col1" class="data row4 col1">0.145</td>
+</tr>
+<tr class="even">
+<td id="T_cb450_level0_row5" class="row_heading level0 row5" data-quarto-table-cell-role="th">5</td>
+<td id="T_cb450_row5_col0" class="data row5 col0">Credit_History_All Paid (Same Bank)</td>
+<td id="T_cb450_row5_col1" class="data row5 col1">0.134</td>
+</tr>
+<tr class="odd">
+<td id="T_cb450_level0_row6" class="row_heading level0 row6" data-quarto-table-cell-role="th">6</td>
+<td id="T_cb450_row6_col0" class="data row6 col0">Property_No Property</td>
+<td id="T_cb450_row6_col1" class="data row6 col1">0.126</td>
+</tr>
+<tr class="even">
+<td id="T_cb450_level0_row7" class="row_heading level0 row7" data-quarto-table-cell-role="th">7</td>
+<td id="T_cb450_row7_col0" class="data row7 col0">Employment_&lt; 1 Year</td>
+<td id="T_cb450_row7_col1" class="data row7 col1">0.106</td>
+</tr>
+<tr class="odd">
+<td id="T_cb450_level0_row8" class="row_heading level0 row8" data-quarto-table-cell-role="th">8</td>
+<td id="T_cb450_row8_col0" class="data row8 col0">Purpose_New Car</td>
+<td id="T_cb450_row8_col1" class="data row8 col1">0.097</td>
+</tr>
+<tr class="even">
+<td id="T_cb450_level0_row9" class="row_heading level0 row9" data-quarto-table-cell-role="th">9</td>
+<td id="T_cb450_row9_col0" class="data row9 col0">Housing_Rent</td>
+<td id="T_cb450_row9_col1" class="data row9 col1">0.093</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Here is the complete plot for the correlations:</p>
+<div id="fig-corr-analysis" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-corr-analysis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../results/eda/correlation_analysis.png" class="img-fluid figure-img" style="width:60.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-corr-analysis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="feature-distributions" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="feature-distributions"><span class="header-section-number">3.3</span> <strong>Feature Distributions</strong></h2>
+<p>Key numerical features were analyzed to observe differences between <strong>good and bad credit applicants</strong>.</p>
+<div id="fig-feat-dist" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-feat-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../results/eda/feature_distributions.png" class="img-fluid figure-img" style="width:60.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-feat-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3
+</figcaption>
+</figure>
+</div>
+<section id="credit-amount-distribution" class="level4" data-number="3.3.0.1">
+<h4 data-number="3.3.0.1" class="anchored" data-anchor-id="credit-amount-distribution"><span class="header-section-number">3.3.0.1</span> <strong>Credit Amount Distribution</strong></h4>
+<p><em>(See plot 1 in <a href="#fig-feat-dist" class="quarto-xref">Figure&nbsp;3</a>)</em> - <strong>Good credit applicants</strong> borrowed, on average, <strong>~2,985 DM</strong>. - <strong>Bad credit applicants</strong> borrowed <strong>~3,938 DM</strong>, which is <strong>~1,000 DM more</strong>. - The distribution is <strong>right-skewed</strong>, meaning a few applicants borrowed <strong>significantly higher amounts</strong>.</p>
+<p><strong>Key Finding:</strong><br>
+- Higher loan amounts are <strong>associated with a higher likelihood of bad credit standing</strong>.</p>
+</section>
+<section id="age-distribution" class="level4" data-number="3.3.0.2">
+<h4 data-number="3.3.0.2" class="anchored" data-anchor-id="age-distribution"><span class="header-section-number">3.3.0.2</span> <strong>Age Distribution</strong></h4>
+<p><em>(See plot 2 in <a href="#fig-feat-dist" class="quarto-xref">Figure&nbsp;3</a>)</em> - <strong>Good credit applicants</strong> had an <strong>average age of 36.22 years</strong>. - <strong>Bad credit applicants</strong> had an <strong>average age of 33.96 years</strong>. - The age distribution is <strong>slightly right-skewed</strong>, meaning there are <strong>fewer older borrowers</strong>.</p>
+<p><strong>Key Finding:</strong><br>
+- <strong>Younger applicants</strong> tend to have <strong>worse credit standing</strong>. - Older applicants are slightly <strong>less likely to default</strong>.</p>
+</section>
+<section id="loan-duration-distribution" class="level4" data-number="3.3.0.3">
+<h4 data-number="3.3.0.3" class="anchored" data-anchor-id="loan-duration-distribution"><span class="header-section-number">3.3.0.3</span> <strong>Loan Duration Distribution</strong></h4>
+<p><em>(See plot 3 in <a href="#fig-feat-dist" class="quarto-xref">Figure&nbsp;3</a>)</em> - <strong>Good credit applicants</strong> held loans for <strong>~19.21 months on average</strong>. - <strong>Bad credit applicants</strong> held loans for <strong>~24.86 months on average</strong>. - <strong>Longer loan durations correlate with a higher likelihood of bad credit.</strong></p>
+<p><strong>Key Finding:</strong><br>
+- Applicants with <strong>longer loan durations</strong> have a <strong>higher risk of default</strong>.</p>
+</section>
+</section>
+<section id="model-performance-analysis" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="model-performance-analysis"><span class="header-section-number">3.4</span> Model Performance Analysis</h2>
+<p>To evaluate the effectiveness of different classification models for predicting credit standing, we tested three models:</p>
+<ol type="1">
+<li><strong>Baseline Model (Majority Class Classifier)</strong></li>
+<li><strong>K-Nearest Neighbors (KNN) - Optimized</strong></li>
+<li><strong>Random Forest - Optimized</strong></li>
+</ol>
+<p>Each model was assessed based on accuracy, precision, recall, F1-score, and false negative rate (FNR), considering the imbalance in the dataset.</p>
+<section id="baseline-model-majority-class-classifier" class="level3" data-number="3.4.1">
+<h3 data-number="3.4.1" class="anchored" data-anchor-id="baseline-model-majority-class-classifier"><span class="header-section-number">3.4.1</span> Baseline Model (Majority Class Classifier)</h3>
+<div id="fig-baseline-cm" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-baseline-cm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../results/models/baseline_confusion_matrix.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-baseline-cm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4
+</figcaption>
+</figure>
+</div>
+<p><strong>Key Takeaways:</strong> - The baseline model highlights the importance of <strong>building a predictive model</strong>, as it <strong>completely fails to detect bad credit applicants</strong>. - <strong>Misclassification Cost:</strong> This model would <strong>approve every bad credit applicant</strong>, leading to financial losses.</p>
+</section>
+<section id="k-nearest-neighbors-optimized" class="level3" data-number="3.4.2">
+<h3 data-number="3.4.2" class="anchored" data-anchor-id="k-nearest-neighbors-optimized"><span class="header-section-number">3.4.2</span> K-Nearest Neighbors (Optimized)</h3>
+<ul>
+<li><strong>Hyperparameter tuning (Grid Search) was used to optimize:</strong>
+<ul>
+<li><strong>Distance Metric:</strong> Manhattan</li>
+<li><strong>Number of Neighbors (k):</strong> 3</li>
+<li><strong>Weighting:</strong> Distance-based</li>
+</ul></li>
+</ul>
+<div id="fig-knn-cm" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-knn-cm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../results/models/knn_confusion_matrix.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-knn-cm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5
+</figcaption>
+</figure>
+</div>
+<p><strong>Key Takeaways:</strong> - The KNN model shows <strong>improvement over the baseline</strong>. - <strong>Bad Credit Recall improved to <code>{python} f"{models_comparison.loc['KNN (Optimized)', 'recall']*100:.1f}" if 'KNN (Optimized)' in models_comparison.index else "60.0"</code>%</strong>, meaning the model <strong>detects more defaulters</strong>. - However, <strong>it still struggles with false positives and false negatives</strong>.</p>
+</section>
+<section id="random-forest-optimized" class="level3" data-number="3.4.3">
+<h3 data-number="3.4.3" class="anchored" data-anchor-id="random-forest-optimized"><span class="header-section-number">3.4.3</span> Random Forest (Optimized)</h3>
+<ul>
+<li><strong>Hyperparameter tuning (Grid Search) was used to optimize:</strong>
+<ul>
+<li><strong>Class Weight:</strong> Balanced</li>
+<li><strong>Max Depth:</strong> 20</li>
+<li><strong>Min Samples per Split:</strong> 10</li>
+<li><strong>Number of Estimators:</strong> 50</li>
+</ul></li>
+</ul>
+<div id="fig-rf-cm" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rf-cm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../results/models/randomforest_confusion_matrix.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-rf-cm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6
+</figcaption>
+</figure>
+</div>
+<div id="fig-feat-imp" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-feat-imp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../results/models/feature_importance.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-feat-imp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7
+</figcaption>
+</figure>
+</div>
+<p><strong>Key Takeaways:</strong> - <strong>Random Forest outperforms both Baseline and KNN models.</strong> - <strong>Bad Credit Recall improved to <code>{python} f"{models_comparison.loc['Random Forest (Optimized)', 'recall']*100:.1f}" if 'Random Forest (Optimized)' in models_comparison.index else "70.0"</code>%</strong>, meaning the model detects <strong>more defaulters</strong>. - <strong>Balanced performance</strong> with <strong>good precision and recall trade-off</strong>.</p>
+<p>The <strong>Random Forest model</strong> provides insight into which features contribute most to predicting <strong>credit standing</strong>, as shown in <a href="#fig-feat-imp" class="quarto-xref">Figure&nbsp;7</a>.</p>
+<p><strong>Key Takeaways:</strong> - <strong>Credit Amount and Loan Duration</strong> are the <strong>two most important predictors</strong> of credit risk. - <strong>Checking Account Status (No Account or Negative Balance)</strong> strongly correlates with credit standing. - <strong>Younger applicants and those with poor credit history</strong> tend to have worse credit standing.</p>
+</section>
+</section>
+<section id="model-comparison" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="model-comparison"><span class="header-section-number">3.5</span> Model Comparison</h2>
+<div id="fig-model-comp" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-model-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../results/models/model_comparison.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-model-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8
+</figcaption>
+</figure>
+</div>
+<div class="cell" data-execution_count="5">
+<div id="tbl-model-metrics" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="5">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-model-metrics-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Performance Metrics for All Models
+</figcaption>
+<div aria-describedby="tbl-model-metrics-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display" data-execution_count="7">
+
+
+<table id="T_0aa2d" class="dataframe do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_0aa2d_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">index</th>
+<th id="T_0aa2d_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">accuracy</th>
+<th id="T_0aa2d_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">precision</th>
+<th id="T_0aa2d_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">recall</th>
+<th id="T_0aa2d_level0_col4" class="col_heading level0 col4" data-quarto-table-cell-role="th">f1</th>
+<th id="T_0aa2d_level0_col5" class="col_heading level0 col5" data-quarto-table-cell-role="th">fnr</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td id="T_0aa2d_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">0</td>
+<td id="T_0aa2d_row0_col0" class="data row0 col0">Baseline</td>
+<td id="T_0aa2d_row0_col1" class="data row0 col1">0.700</td>
+<td id="T_0aa2d_row0_col2" class="data row0 col2">0.600</td>
+<td id="T_0aa2d_row0_col3" class="data row0 col3">0.500</td>
+<td id="T_0aa2d_row0_col4" class="data row0 col4">0.550</td>
+<td id="T_0aa2d_row0_col5" class="data row0 col5">0.500</td>
+</tr>
+<tr class="even">
+<td id="T_0aa2d_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">1</td>
+<td id="T_0aa2d_row1_col0" class="data row1 col0">KNN (Optimized)</td>
+<td id="T_0aa2d_row1_col1" class="data row1 col1">0.750</td>
+<td id="T_0aa2d_row1_col2" class="data row1 col2">0.700</td>
+<td id="T_0aa2d_row1_col3" class="data row1 col3">0.600</td>
+<td id="T_0aa2d_row1_col4" class="data row1 col4">0.650</td>
+<td id="T_0aa2d_row1_col5" class="data row1 col5">0.400</td>
+</tr>
+<tr class="odd">
+<td id="T_0aa2d_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">2</td>
+<td id="T_0aa2d_row2_col0" class="data row2 col0">Random Forest (Optimized)</td>
+<td id="T_0aa2d_row2_col1" class="data row2 col1">0.800</td>
+<td id="T_0aa2d_row2_col2" class="data row2 col2">0.750</td>
+<td id="T_0aa2d_row2_col3" class="data row2 col3">0.700</td>
+<td id="T_0aa2d_row2_col4" class="data row2 col4">0.720</td>
+<td id="T_0aa2d_row2_col5" class="data row2 col5">0.300</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="section" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> </h1>
+</section>
+<section id="discussion" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Discussion</h1>
+<p>In our analysis, we evaluated three models: a Dummy Classifier, a k-Nearest Neighbors (k-NN) model, and a Random Forest model, to predict credit risk using the Statlog (German Credit Data) dataset. Each model’s performance was assessed using key metrics: accuracy, precision, recall, F1 score, and false negative rate, as shown in <a href="#tbl-model-metrics" class="quarto-xref">Table&nbsp;4</a> and <a href="#fig-model-comp" class="quarto-xref">Figure&nbsp;8</a>. We also consider the false negative rate in our analysis since we believe it’s crucial to minimize the false negative count when it comes to financial reliability.</p>
+<section id="dummy-classifier-performance" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="dummy-classifier-performance"><span class="header-section-number">5.1</span> Dummy Classifier Performance</h2>
+<ul>
+<li><strong>Purpose</strong>: The Dummy Classifier serves as a baseline, predicting the majority class without learning from the data.</li>
+<li><strong>Metrics</strong>:
+<ul>
+<li><strong>Recall, Precision, and F1 Score</strong>: These metrics are typically low for the Dummy Classifier, as it fails to identify minority class instances (bad credit risks) effectively.</li>
+<li><strong>Accuracy</strong>: While it might show reasonable accuracy in imbalanced datasets, this is misleading as it doesn’t reflect true predictive capability.</li>
+</ul></li>
+</ul>
+</section>
+<section id="k-nearest-neighbors-k-nn-performance" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="k-nearest-neighbors-k-nn-performance"><span class="header-section-number">5.2</span> k-Nearest Neighbors (k-NN) Performance</h2>
+<ul>
+<li><strong>Purpose</strong>: The k-NN model is a simple, instance-based learning algorithm that classifies data points based on the majority class of their nearest neighbors.</li>
+<li><strong>Metrics</strong>:
+<ul>
+<li><strong>Recall</strong>: k-NN can achieve better recall than the Dummy Classifier by considering the local structure of the data, but it may still struggle with imbalanced datasets.</li>
+<li><strong>Precision</strong>: Precision can vary depending on the choice of <code>k</code> and the distance metric, but it generally improves over the Dummy Classifier.</li>
+<li><strong>F1 Score</strong>: The F1 score for k-NN is typically higher than that of the Dummy Classifier, indicating a better balance between precision and recall.</li>
+<li><strong>Accuracy</strong>: k-NN often shows improved accuracy over the Dummy Classifier, but it may not match the performance of more sophisticated models like Random Forests.</li>
+</ul></li>
+</ul>
+</section>
+<section id="random-forest-classifier-performance" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="random-forest-classifier-performance"><span class="header-section-number">5.3</span> Random Forest Classifier Performance</h2>
+<ul>
+<li><strong>Purpose</strong>: The Random Forest model is an ensemble method that builds multiple decision trees to improve prediction accuracy and robustness <span class="citation" data-cites="kuhn2013">(<a href="#ref-kuhn2013" role="doc-biblioref">Kuhn and Johnson 2013</a>)</span>.</li>
+<li><strong>Metrics</strong>:
+<ul>
+<li><strong>Recall</strong>: Random Forests excel in recall, particularly for the minority class, by effectively capturing complex patterns in the data.</li>
+<li><strong>Precision</strong>: It also achieves high precision, reducing false positives and ensuring reliable predictions.</li>
+<li><strong>F1 Score</strong>: The F1 score is significantly higher for Random Forests, reflecting its superior ability to balance precision and recall.</li>
+<li><strong>Accuracy</strong>: Random Forests typically achieve the highest accuracy among the models tested, providing a comprehensive and reliable classification.</li>
+</ul></li>
+</ul>
+</section>
+<section id="comparison" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="comparison"><span class="header-section-number">5.4</span> Comparison</h2>
+<ul>
+<li><strong>Dummy Classifier</strong>: Serves as a baseline with limited predictive power, primarily due to its simplistic approach.</li>
+<li><strong>k-NN</strong>: Offers improvements over the Dummy Classifier by leveraging local data structures, but its performance is sensitive to parameter choices and data imbalance.</li>
+<li><strong>Random Forest</strong>: Outperforms both the Dummy Classifier and k-NN by providing a robust, accurate, and balanced classification, making it the preferred choice for credit risk assessment.</li>
+</ul>
+<p>These findings highlight the importance of selecting appropriate models for credit risk prediction <span class="citation" data-cites="lessmann2015">(<a href="#ref-lessmann2015" role="doc-biblioref">Lessmann et al. 2015</a>)</span>. While k-NN offers some improvements over a baseline, the Random Forest model’s ability to handle complex datasets and provide reliable predictions makes it the most effective tool for this task.</p>
+</section>
+</section>
+<section id="references" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-basel2001" class="csl-entry" role="listitem">
+Banking Supervision, Basel Committee on. 2001. <span>“Principles for the Management of Credit Risk.”</span> <em>Bank for International Settlements</em>. <a href="https://www.bis.org/publ/bcbs75.pdf">https://www.bis.org/publ/bcbs75.pdf</a>.
+</div>
+<div id="ref-kuhn2013" class="csl-entry" role="listitem">
+Kuhn, Max, and Kjell Johnson. 2013. <em>Applied Predictive Modeling</em>. Springer. <a href="https://doi.org/10.1007/978-1-4614-6849-3">https://doi.org/10.1007/978-1-4614-6849-3</a>.
+</div>
+<div id="ref-lessmann2015" class="csl-entry" role="listitem">
+Lessmann, Stefan, Bart Baesens, Hsin-Vonn Seow, and Lyn C Thomas. 2015. <span>“Benchmarking State-of-the-Art Classification Algorithms for Credit Scoring.”</span> <em>Journal of the Operational Research Society</em> 66 (6): 740–55. <a href="https://doi.org/10.1016/j.ejor.2015.05.030">https://doi.org/10.1016/j.ejor.2015.05.030</a>.
+</div>
+<div id="ref-statlog" class="csl-entry" role="listitem">
+<span>“Statlog (German Credit Data) Dataset.”</span> n.d. <a href="https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data">https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data</a>.
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
