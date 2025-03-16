@@ -1,0 +1,49 @@
+Feature,Importance
+Credit_Amount,0.10027577468891287
+Duration (in months),0.10017832768770818
+Checking_Acc_Status_No Checking Account,0.08290135177685083
+Age,0.07363827557113431
+Checking_Acc_Status_< 0 DM,0.05524181236045757
+Credit_History_Critical Account / Other Existing Credits,0.035092569199763154
+Savings_Acc_< 100 DM,0.02968073201976964
+Installment_Rate,0.029237769835029417
+Residence_Since,0.027607394635201406
+Property_No Property,0.022320912960108553
+Other_Installment_None,0.021968585848268128
+Property_Real Estate,0.021103362819008743
+Employment_< 1 Year,0.01931164010781101
+Savings_Acc_No Savings Account,0.018383569361606792
+Purpose_Radio/TV,0.018354690228878794
+Purpose_Used Car,0.018345337708640767
+Purpose_Education,0.017567198470313752
+Credit_History_No Credit Taken / All Paid,0.017437564596659995
+Personal_Status_Male: Single,0.017434361597065393
+Existing_Credits,0.01649271097139679
+Job_Skilled Employee / Official,0.013870782191893234
+"Telephone_Yes, Registered",0.013689843660519584
+Housing_Rent,0.013298349327085394
+Housing_Own,0.013170268292267022
+Credit_History_Past Delays in Payment,0.013166446786531902
+Purpose_New Car,0.012978905847086249
+Num_People_Maintained,0.012866685874848634
+Credit_History_All Paid (Same Bank),0.012298299864464004
+Employment_4-7 Years,0.012227140302407352
+Property_Car or Other Property,0.012128400968435354
+Purpose_Furniture/Equipment,0.011905091864234862
+Employment_>= 7 Years,0.011745370186160781
+Other_Debtors_None,0.01093670198059246
+Other_Debtors_Guarantor,0.010290369803805297
+Checking_Acc_Status_>= 200 DM or Salary Assigned,0.01022451993879859
+Job_Unskilled (Resident),0.009295808544817779
+Savings_Acc_>= 1000 DM,0.00887903025169572
+Other_Installment_Stores,0.008849352904884032
+Personal_Status_Male: Married/Widowed,0.00782919063598628
+Personal_Status_Male: Divorced/Separated,0.0073655247732219205
+Foreign_Worker_Yes,0.00698801668186068
+Employment_Unemployed,0.00585808489277875
+Savings_Acc_500-1000 DM,0.005646165241304627
+Purpose_Repairs,0.005071557053940052
+Job_Unemployed / Unskilled (Non-Resident),0.0022718218692139238
+Purpose_Others,0.0019804783449612214
+Purpose_Domestic Appliances,0.001509233389101133
+Purpose_Retraining,0.0010846160825171698

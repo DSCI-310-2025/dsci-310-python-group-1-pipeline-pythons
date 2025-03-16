@@ -7,7 +7,9 @@ RUN pip install pandas==2.2.3 \
     seaborn==0.13.2 \
     scipy==1.11.3 \
     numpy==1.26.4 \
-    scikit-learn==1.3.0
+    scikit-learn==1.3.0\
+    click==8.1.7 \
+    requests==2.31.0
 
 RUN mkdir -p /app && chown -R root:root /app && chmod -R 777 /app
 
