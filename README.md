@@ -1,11 +1,10 @@
 # dsci-310-python-group-1-pipeline-pythons
 
 ### Project title: 
-___
+Credit Risk Prediction
 
 ### List of contributors/authors: 
 Zhanerke Zhumash, Stallon Pinto, Ayush Joshi
-___
 
 
 ### Summary of the project 
@@ -45,3 +44,26 @@ The analysis requires the following Python packages, which are installed in the 
 ___
 ###  The names of the licenses contained in LICENSE.md:
 - MIT License
+- Creative Commons License 
+
+## Usage of Makefile
+To run the entire pipeline, use:
+```bash sh
+make 
+```
+This will:
+1. Preprocess raw data
+2. Perform exploratory analysis
+3. Generate reports
+
+### Cleaning Up
+To remove generated files, run:
+```sh
+make clean
+```
+
+## File Structure
+- `data/raw/raw_data.csv` - Input raw dataset
+- `data/processed/german_processed.csv` - Preprocessed dataset
+- `output/model_results.txt` - Analysis results
+- `reports/report.qmd` - Quarto report source
