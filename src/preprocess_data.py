@@ -14,6 +14,8 @@ import os
 import click
 import pandas as pd
 import numpy as np
+from src.data_cleaning import apply_mappings
+
 
 @click.command()
 @click.option('--input', default="../data/raw/raw_data.csv", show_default=True, help="Path to raw input file")
@@ -128,8 +130,7 @@ def preprocess_data(input, output):
         }
         
         # Apply mappings to categorical columns
-        for col, mapping in mappings.items():
-            df[col] = df[col].map(mapping)
+        df = apply_mappings(df, mappings)
         
         # Convert categorical data to numerical format using one-hot encoding
         df = pd.get_dummies(df, drop_first=True).astype(int)
