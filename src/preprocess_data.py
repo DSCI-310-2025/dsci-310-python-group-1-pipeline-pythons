@@ -14,7 +14,7 @@ import os
 import click
 import pandas as pd
 import numpy as np
-from src.data_cleaning import apply_mappings
+from data_cleaning import apply_mappings, load_and_prepare_raw_data
 
 
 @click.command()
@@ -27,21 +27,9 @@ def preprocess_data(input, output):
     os.makedirs(os.path.dirname(output), exist_ok=True)
     
     try:
-        # Load the data
+        # Load and prepare the data using the abstracted function
         print(f"Loading data from {input}...")
-        df = pd.read_csv(input, sep=" ", header=None)
-        
-        # Define column names
-        column_names = [
-            "Checking_Acc_Status", "Duration (in months)", "Credit_History", "Purpose",
-            "Credit_Amount", "Savings_Acc", "Employment", "Installment_Rate",
-            "Personal_Status", "Other_Debtors", "Residence_Since", "Property",
-            "Age", "Other_Installment", "Housing", "Existing_Credits",
-            "Job", "Num_People_Maintained", "Telephone", "Foreign_Worker", "Credit Standing"
-        ]
-        
-        # Assign column names
-        df.columns = column_names
+        df = load_and_prepare_raw_data(input)
         
         # Define mappings for categorical variables
         mappings = {
