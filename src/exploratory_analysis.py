@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from src.visualization import (
+from visualization import (
     create_output_dir,
     plot_corr_barplot,
     plot_credit_standing_distribution,
