@@ -41,6 +41,10 @@ The analysis requires the following Python packages, which are installed in the 
 - scipy==1.11.3
 - numpy==1.26.4
 - scikit-learn==1.3.0
+- click==8.1.7
+- requests==2.32.3
+- pytest==8.3.5
+
 ___
 ###  The names of the licenses contained in LICENSE.md:
 - MIT License
