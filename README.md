@@ -72,26 +72,38 @@ make clean
 ## Directory Structure
 ```
 dsci-310-python-group-1-pipeline-pythons/
-├── data/
-│   ├── raw/
-│   │   └── raw_data.csv          # Input raw dataset
-│   └── processed/
-│       └── german_processed.csv   # Preprocessed dataset
-├── output/
-│   └── model_results.txt          # Analysis results
-├── reports/
-│   └── credit_risk_analysis.qmd   # Quarto report source
-├── src/
-│   ├── functions/
-│   │   ├── __init__.py            # Makes functions a package
-│   │   ├── data_validation.py      # Data validation functions
-│   │   └── model_utils.py          # Utility functions for loading data and visualizations
-│   ├── exploratory_analysis.py     # Script for exploratory data analysis
-│   ├── preprocess_data.py          # Script for preprocessing data
-│   └── credit_risk_analysis.ipynb  # Jupyter Notebook for credit risk analysis
-└── tests/
-    ├── test_data_validation.py      # Tests for data validation functions
-    └── test_project_utils.py        # Tests for utility functions
+├── data/                             # Directory for datasets
+│   ├── raw/                          # Directory for raw input data
+│   │   └── raw_data.csv              # Input raw dataset
+│   └── processed/                    # Directory for processed data
+│       └── german_processed.csv       # Preprocessed dataset
+├── results/                          # Directory for results and outputs
+│   ├── model_results.txt              # Analysis results summary
+│   ├── eda/                           # Directory for EDA visualizations
+│   │   ├── credit_standing_distribution.png  # Visualization of credit standing distribution
+│   │   ├── correlation_analysis.png    # Visualization of correlation analysis
+│   │   └── feature_distributions.png   # Visualization of feature distributions
+│   └── models/                        # Directory for model outputs
+│       ├── baseline_confusion_matrix.png  # Confusion matrix for baseline model
+│       ├── feature_importance.png      # Feature importance plot
+│       ├── knn_confusion_matrix.png    # Confusion matrix for KNN model
+│       ├── model_comparison.png         # Comparison of different models
+│       └── randomforest_confusion_matrix.png  # Confusion matrix for Random Forest model
+├── reports/                           # Directory for reports
+│   └── credit_risk_analysis.qmd       # Quarto report source
+├── src/                               # Directory for source code
+│   ├── functions/                     # Directory for utility functions
+│   │   ├── __init__.py                # Makes functions a package
+│   │   ├── data_validation.py          # Data validation functions
+│   │   └── model_utils.py              # Utility functions for loading data and visualizations
+│   ├── exploratory_analysis.py         # Script for exploratory data analysis
+│   ├── preprocess_data.py              # Script for preprocessing data
+│   ├── model_training.py               # Script for training models
+│   └── download_data.py                # Script for downloading data
+└── tests/                             # Directory for test cases
+    ├── conftest.py                     # Configuration for pytest
+    ├── test_data_validation.py          # Tests for data validation functions
+    └── test_project_utils.py            # Tests for utility functions
 ```
 
 ### Notes on Reproducibility
