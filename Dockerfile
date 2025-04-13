@@ -31,10 +31,10 @@ RUN pip install pandas==2.2.3 \
     pytest==8.3.5 \
     pyarrow==19.0.1
 
-# Install custom creditriskutilities package from TestPyPI
 RUN pip install --index-url https://test.pypi.org/simple/ \
     --extra-index-url https://pypi.org/simple \
-    creditriskutilities
+    creditriskutilities==1.0.1
+
 
 # Create the application directory with appropriate permissions
 RUN mkdir -p /app && chown -R root:root /app && chmod -R 777 /app && chmod -R 755 /app
