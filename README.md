@@ -80,7 +80,7 @@ dsci-310-python-group-1-pipeline-pythons/
 ├── output/
 │   └── model_results.txt          # Analysis results
 ├── reports/
-│   └── report.qmd                 # Quarto report source
+│   └── credit_risk_analysis.qmd   # Quarto report source
 ├── src/
 │   ├── functions/
 │   │   ├── __init__.py            # Makes functions a package
