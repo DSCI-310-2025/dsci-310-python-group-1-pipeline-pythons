@@ -11,6 +11,7 @@ format:
     fig-height: 6
     fig-cap-location: bottom
     tbl-cap-location: top
+    self_contained: true
   pdf:
     toc: true
     fig-pos: "H"
