@@ -106,7 +106,6 @@ dsci-310-python-group-1-pipeline-pythons/
 This project includes a Python package that has been published on TestPyPI. You can install it using the following command:
 
 ```
-bash
 pip install --index-url https://test.pypi.org/simple/ creditriskutilities
 ```
 
