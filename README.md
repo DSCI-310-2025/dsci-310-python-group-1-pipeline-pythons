@@ -101,3 +101,13 @@ dsci-310-python-group-1-pipeline-pythons/
 ### Additional Information
 - For any issues or contributions, please refer to the project's GitHub repository.
 - Ensure to check the `LICENSE.md` file for licensing information.
+
+## Package Information
+This project includes a Python package that has been published on TestPyPI. You can install it using the following command:
+
+```
+bash
+pip install --index-url https://test.pypi.org/simple/ creditriskutilities
+```
+
+To make this simpler, we have already added this into the dockerfile for ease in reproducibility
