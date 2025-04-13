@@ -3,99 +3,90 @@ import pytest
 from src.functions.data_validation import (
     check_missing_values,
     check_data_types,
-    check_unique_values,
+    check_zero_variance_columns,
     check_value_ranges,
     check_duplicates,
     check_column_names,
     check_outliers,
-    check_date_format
+    check_class_balance
 )
 
 def test_check_missing_values():
-    # Assume check_missing_values returns a dict with missing counts per column.
+    """Test that missing values are counted correctly."""
     df = pd.DataFrame({'A': [1, 2, None], 'B': [4, 5, 6]})
-    missing_counts = check_missing_values(df)
-    assert missing_counts['A'] == 1
+    missing = check_missing_values(df)
+    assert missing['A'] == 1
+    assert missing['B'] == 0
 
 def test_check_data_types_valid():
+    """Test that correct data types return True."""
     df = pd.DataFrame({'A': [1, 2, 3], 'B': ['x', 'y', 'z']})
-    expected_types = {'A': 'int64', 'B': 'object'}
-    result = check_data_types(df, expected_types)
-    # If result is a Series, force it to a single Boolean.
-    if hasattr(result, "all"):
-        result = result.all()
-    assert result == True
+    expected = {'A': 'int64', 'B': 'object'}
+    assert check_data_types(df, expected) == True
 
 def test_check_data_types_invalid():
+    """Test that mismatched data types raise TypeError."""
     df = pd.DataFrame({'A': [1, 2, 3], 'B': ['x', 'y', 'z']})
-    expected_types = {'A': 'int64', 'B': 'int64'}  # B is actually object.
-    # Either expect a TypeError or a False result.
-    try:
-        result = check_data_types(df, expected_types)
-        if hasattr(result, "all"):
-            result = result.all()
-        assert result == False
-    except TypeError:
-        pass  # Acceptable alternative behavior.
+    expected = {'A': 'int64', 'B': 'int64'}
+    with pytest.raises(TypeError):
+        check_data_types(df, expected)
 
-def test_check_unique_values_valid():
-    df = pd.DataFrame({'A': [1, 2, 3], 'B': [1, 1, 1]})
-    # For column A, values are unique.
-    assert check_unique_values(df, 'A') == True
-
-def test_check_unique_values_not_unique():
-    df = pd.DataFrame({'A': [1, 2, 2], 'B': [1, 1, 1]})
-    assert check_unique_values(df, 'A') == False
+def test_check_zero_variance_columns():
+    """Test detection of columns with zero variance."""
+    df = pd.DataFrame({
+        'A': [1, 1, 1],
+        'B': [2, 3, 4],
+        'C': [5, 5, 5]
+    })
+    zero_var = check_zero_variance_columns(df)
+    assert set(zero_var) == {'A', 'C'}
 
 def test_check_value_ranges_valid():
+    """Test that valid range check passes."""
     df = pd.DataFrame({'A': [1, 2, 3]})
-    # Expect True when all values are within [0, 5].
     assert check_value_ranges(df, 'A', 0, 5) == True
 
 def test_check_value_ranges_invalid():
-    df = pd.DataFrame({'A': [1, 6, 3]})
-    # Expect False when a value is out-of-range.
+    """Test that range check fails when value out of bounds."""
+    df = pd.DataFrame({'A': [1, 2, 10]})
     assert check_value_ranges(df, 'A', 0, 5) == False
 
 def test_check_duplicates_valid():
-    df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    # Expect 0 duplicate rows.
+    """Test that no duplicates returns 0."""
+    df = pd.DataFrame({'A': [1, 2, 3]})
     assert check_duplicates(df) == 0
 
 def test_check_duplicates_invalid():
-    df = pd.DataFrame({'A': [1, 2, 2], 'B': [4, 5, 6]})
-    # Count duplicates based on column 'A'
+    """Test that duplicate count is correct."""
+    df = pd.DataFrame({'A': [1, 2, 2]})
     assert check_duplicates(df, subset=['A']) == 1
 
-
 def test_check_column_names_valid():
+    """Test that all expected columns are present."""
     df = pd.DataFrame(columns=['A', 'B', 'C'])
-    expected_columns = ['A', 'B']
-    # Expect True if all expected columns are present.
-    assert check_column_names(df, expected_columns) == True
+    assert check_column_names(df, ['A', 'B']) == True
 
 def test_check_column_names_invalid():
+    """Test that missing columns return False."""
     df = pd.DataFrame(columns=['A', 'C'])
-    expected_columns = ['A', 'B']
-    # Instead of raising an error, we now expect False.
-    assert check_column_names(df, expected_columns) == False
+    assert check_column_names(df, ['A', 'B']) == False
 
 def test_check_outliers_valid():
+    """Test that no values exceed threshold."""
     df = pd.DataFrame({'A': [1, 2, 3]})
-    # With a threshold of 50, expect no outliers.
-    assert check_outliers(df, 'A', 50) == 0
+    assert check_outliers(df, 'A', 100) == 0
 
 def test_check_outliers_invalid():
-    df = pd.DataFrame({'A': [1, 2, 100]})
-    # Expect 1 outlier (the 100 exceeds threshold 50).
-    assert check_outliers(df, 'A', 50) == 1
+    """Test detection of values above threshold."""
+    df = pd.DataFrame({'A': [1, 2, 300]})
+    assert check_outliers(df, 'A', 100) == 1
 
-def test_check_date_format_valid():
-    df = pd.DataFrame({'date_column': ['2021-01-01', '2021-02-01']})
-    # Expect True when dates match '%Y-%m-%d'.
-    assert check_date_format(df, 'date_column', '%Y-%m-%d') == True
+def test_check_class_balance_pass():
+    """Test that a reasonably balanced target passes."""
+    df = pd.DataFrame({'target': [0, 1, 0, 1]})
+    assert check_class_balance(df, 'target', threshold=0.9) == True
 
-def test_check_date_format_invalid():
-    df = pd.DataFrame({'date_column': ['2021/01/01', '2021-02-01']})
-    # Expect False when the date format does not match.
-    assert check_date_format(df, 'date_column', '%Y-%m-%d') == False
+def test_check_class_balance_fail():
+    """Test that imbalanced classes fail the threshold check."""
+    df = pd.DataFrame({'target': [1, 1, 1, 1, 1, 0]})
+    assert check_class_balance(df, 'target', threshold=0.7) == False

@@ -134,7 +134,7 @@ df.head().style.set_table_attributes('class="dataframe"')
 
 ```{python}
 #| label: tbl-mapped-data
-#| tbl-cap: "German Credit Data with Mapped Values (First 5 Rows)"
+#| tbl-cap: "German Credit Data with Mapped Values (First 5 Rows)" 
 df.head().style.set_table_attributes('class="dataframe"')
 ```
 
