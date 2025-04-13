@@ -13,7 +13,6 @@ Options:
 import os
 import click
 import requests
-import pandas as pd
 
 @click.command()
 @click.option('--url', default="https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data", show_default=True, help="URL to download data from")

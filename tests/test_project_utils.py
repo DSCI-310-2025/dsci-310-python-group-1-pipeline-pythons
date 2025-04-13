@@ -1,13 +1,8 @@
-import os
 import pandas as pd
 import pytest
+from src.data_cleaning import load_and_prepare_raw_data
+from src.visualization import plot_corr_barplot, plot_credit_standing_distribution, plot_feature_distributions
 
-from src.visualization import (
-    create_output_dir,
-    plot_corr_barplot,
-    plot_credit_standing_distribution,
-    plot_feature_distributions
-)
 
 
 @pytest.fixture
@@ -19,10 +14,33 @@ def mock_df():
         'Credit Standing': [0, 1, 0, 1]
     })
 
-def test_create_output_dir(tmp_path):
-    test_path = tmp_path / "subdir"
-    create_output_dir(str(test_path))
-    assert test_path.exists()
+
+
+def test_load_and_prepare_raw_data_valid(tmp_path):
+    # Create dummy file
+    content = "A11 6 A34 A43 1169 A65 A75 4 A93 A101 4 A121 67 A143 A152 2 A173 1 A191 A201 1"
+    file_path = tmp_path / "raw_data.txt"
+    file_path.write_text(content)
+
+    # Read with function
+    df = load_and_prepare_raw_data(str(file_path))
+
+    assert isinstance(df, pd.DataFrame)
+    assert df.shape == (1, 21)
+    assert "CreditAmount" in df.columns
+
+def test_load_and_prepare_raw_data_missing_file():
+    with pytest.raises(FileNotFoundError):
+        load_and_prepare_raw_data("non_existent_file.txt")
+
+def test_load_and_prepare_raw_data_bad_format(tmp_path):
+    # Create a poorly formatted file (wrong column count)
+    content = "A11 6 A34 A43"
+    file_path = tmp_path / "bad_data.txt"
+    file_path.write_text(content)
+
+    with pytest.raises(ValueError):
+        load_and_prepare_raw_data(str(file_path))
 
 def test_plot_corr_barplot(mock_df, tmp_path):
     save_path = tmp_path / "corr_plot.png"
