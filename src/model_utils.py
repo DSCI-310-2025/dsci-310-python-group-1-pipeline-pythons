@@ -1,207 +1,121 @@
 #!/usr/bin/env python
 """
-Utility functions for model training and evaluation for credit risk prediction.
+Utility functions for loading data and producing visualizations for EDA.
 """
 
 import os
 import pandas as pd
-import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score
 
-def evaluate_model(model, X_test, y_test, model_name, output_dir, X_test_scaled=None):
+def load_and_prepare_raw_data(filepath: str) -> pd.DataFrame:
     """
-    Evaluate a machine learning model and save performance metrics and visualizations.
-    
-    Parameters
-    ----------
-    model : sklearn estimator
-        The trained model to evaluate
-    X_test : pandas.DataFrame or numpy.ndarray
-        Test features
-    y_test : pandas.Series or numpy.ndarray
-        True target values
-    model_name : str
-        Name of the model for saving files
-    output_dir : str
-        Directory to save evaluation results
-    X_test_scaled : pandas.DataFrame or numpy.ndarray, optional
-        Scaled test features, used if model requires scaled input
-        
-    Returns
-    -------
-    dict
-        Dictionary containing model performance metrics
-    
-    Examples
-    --------
-    >>> from sklearn.ensemble import RandomForestClassifier
-    >>> from sklearn.datasets import make_classification
-    >>> from sklearn.model_selection import train_test_split
-    >>> X, y = make_classification(random_state=42)
-    >>> X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
-    >>> model = RandomForestClassifier().fit(X_train, y_train)
-    >>> metrics = evaluate_model(model, X_test, y_test, "RandomForest", "./results")
-    >>> metrics['accuracy'] > 0.7
-    True
-    """
-    # Create directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Use scaled data if provided
-    X_test_eval = X_test_scaled if X_test_scaled is not None else X_test
-    
-    # Make predictions
-    y_pred = model.predict(X_test_eval)
-    y_pred_proba = model.predict_proba(X_test_eval)[:, 1] if hasattr(model, "predict_proba") else None
-    
-    # Calculate metrics
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
-    
-    # Print metrics
-    print(f"\n{model_name} Performance:")
-    print(f"Accuracy: {accuracy:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall: {recall:.4f}")
-    print(f"F1 Score: {f1:.4f}")
-    
-    # Save classification report
-    report = classification_report(y_test, y_pred, target_names=['Good Credit', 'Bad Credit'], output_dict=True)
-    report_df = pd.DataFrame(report).transpose()
-    report_df.to_csv(os.path.join(output_dir, f'{model_name.lower().replace(" ", "_")}_classification_report.csv'))
-    
-    # Plot confusion matrix
-    plt.figure(figsize=(8, 6))
-    cm = confusion_matrix(y_test, y_pred)
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
-                xticklabels=['Good Credit', 'Bad Credit'],
-                yticklabels=['Good Credit', 'Bad Credit'])
-    plt.title(f'Confusion Matrix - {model_name}', fontsize=14, fontweight='bold')
-    plt.ylabel('True Label', fontsize=12)
-    plt.xlabel('Predicted Label', fontsize=12)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, f'{model_name.lower().replace(" ", "_")}_confusion_matrix.png'), dpi=300)
-    plt.close()
-    
-    return {
-        'model_name': model_name,
-        'accuracy': accuracy,
-        'precision': precision,
-        'recall': recall,
-        'f1': f1,
-    }
+    Loads the raw German credit data and returns a cleaned DataFrame with assigned column names.
 
-def plot_feature_importance(model, feature_names, output_dir, n_top=15):
-    """
-    Plot and save feature importance for tree-based models.
-    
-    Parameters
-    ----------
-    model : sklearn estimator
-        Trained model with feature_importances_ attribute
-    feature_names : list or array-like
-        Names of the features
-    output_dir : str
-        Directory to save the plot
-    n_top : int, optional
-        Number of top features to display, default is 15
-        
-    Returns
-    -------
-    pandas.DataFrame
-        DataFrame containing feature importance values
-        
-    Raises
-    ------
-    AttributeError
-        If model doesn't have feature_importances_ attribute
-        
-    Examples
+    Parameters:
+    ------------
+    filepath : str
+        The path to the raw data file.
+
+    Returns:
     --------
-    >>> from sklearn.ensemble import RandomForestClassifier
-    >>> from sklearn.datasets import make_classification
-    >>> X, y = make_classification(n_features=5, random_state=42)
-    >>> feature_names = ['feature1', 'feature2', 'feature3', 'feature4', 'feature5']
-    >>> model = RandomForestClassifier().fit(X, y)
-    >>> importance_df = plot_feature_importance(model, feature_names, "./results")
-    >>> len(importance_df) == 5
-    True
+    pd.DataFrame
+        A cleaned DataFrame with proper column names.
+
+    Raises:
+    -------
+    FileNotFoundError
+        If the file does not exist at the specified path.
+    pd.errors.ParserError
+        If the file cannot be parsed by pandas.
     """
-    if not hasattr(model, 'feature_importances_'):
-        raise AttributeError("Model does not have feature_importances_ attribute")
+    if not os.path.exists(filepath):
+        raise FileNotFoundError(f"Input file not found at path: {filepath}")
+
+    try:
+        df = pd.read_csv(filepath, sep=" ", header=None)
+    except pd.errors.ParserError as e:
+        raise pd.errors.ParserError(f"Failed to parse file: {e}")
+
+    # Define columns (example, replace with actual column names)
+    column_names = [
+            "Checking_Acc_Status", "Duration (in months)", "Credit_History", "Purpose",
+            "Credit_Amount", "Savings_Acc", "Employment", "Installment_Rate",
+            "Personal_Status", "Other_Debtors", "Residence_Since", "Property",
+            "Age", "Other_Installment", "Housing", "Existing_Credits",
+            "Job", "Num_People_Maintained", "Telephone", "Foreign_Worker", "Credit Standing"
+        ]
     
-    # Create directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Create feature importance DataFrame
-    feature_importance = pd.DataFrame({
-        'Feature': feature_names,
-        'Importance': model.feature_importances_
-    }).sort_values('Importance', ascending=False)
-    
-    # Save feature importance
-    feature_importance.to_csv(os.path.join(output_dir, 'feature_importance.csv'), index=False)
-    
-    # Plot feature importance
+
+    if len(df.columns) != len(column_names):
+        raise ValueError("Number of columns in raw data does not match expected column names")
+
+    df.columns = column_names
+
+    return df
+
+
+def plot_corr_barplot(df: pd.DataFrame, target: str, save_path: str):
+    corr = df.corr()[target].sort_values(ascending=False)
+
     plt.figure(figsize=(12, 8))
-    sns.barplot(x='Importance', y='Feature', data=feature_importance.head(n_top))
-    plt.title(f'Top {n_top} Features by Importance', fontsize=14, fontweight='bold')
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'feature_importance.png'), dpi=300)
-    plt.close()
-    
-    return feature_importance
+    bars = sns.barplot(x=corr.values, y=corr.index)
+    plt.title(f'Feature Correlation with {target}', fontsize=16, fontweight='bold')
+    plt.xlabel('Correlation Coefficient')
+    plt.axvline(x=0, color='black', linestyle='-', alpha=0.3)
 
-def compare_models(model_metrics_list, output_dir):
-    """
-    Compare multiple models and visualize their performance metrics.
-    
-    Parameters
-    ----------
-    model_metrics_list : list of dict
-        List of dictionaries containing model metrics from evaluate_model function
-    output_dir : str
-        Directory to save comparison results
-        
-    Returns
-    -------
-    pandas.DataFrame
-        DataFrame containing model comparison metrics
-        
-    Raises
-    ------
-    ValueError
-        If model_metrics_list is empty
-    """
-    # Check if the list is empty
-    if not model_metrics_list:
-        raise ValueError("Model metrics list cannot be empty")
-        
-    # Create directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Create comparison DataFrame
-    models_comparison = pd.DataFrame(model_metrics_list)
-    models_comparison = models_comparison.set_index('model_name')
-    
-    # Save model comparison
-    models_comparison.to_csv(os.path.join(output_dir, 'model_comparison.csv'))
-    
-    # Plot model comparison
-    plt.figure(figsize=(12, 6))
-    models_comparison[['accuracy', 'precision', 'recall', 'f1']].plot(kind='bar', colormap='viridis')
-    plt.title('Model Performance Comparison', fontsize=14, fontweight='bold')
-    plt.ylabel('Score', fontsize=12)
-    plt.ylim(0, 1)
-    plt.xticks(rotation=0)
-    plt.legend(loc='lower right')
+    for i, val in enumerate(corr.values):
+        color = '#e74c3c' if val > 0 else '#3498db'
+        bars.patches[i].set_color(color)
+        plt.text(val + 0.01 if val >= 0 else val - 0.06, i, f'{val:.2f}', va='center', fontsize=10)
+
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'model_comparison.png'), dpi=300)
+    plt.savefig(save_path, dpi=300)
     plt.close()
-    
-    return models_comparison
+
+def plot_credit_standing_distribution(df: pd.DataFrame, save_path: str):
+    custom_palette = ['#3498db', '#e74c3c']
+    counts = df['Credit Standing'].value_counts()
+
+    plt.figure(figsize=(8, 8))
+    ax = sns.barplot(x=counts.index, y=counts.values, palette=custom_palette)
+    plt.title('Credit Standing Distribution', fontsize=16, fontweight='bold')
+    plt.xlabel('Credit Standing (0=Good, 1=Bad)')
+    plt.ylabel('Count')
+    plt.xticks([0, 1], ['Good (0)', 'Bad (1)'])
+
+    total = len(df)
+    for i, p in enumerate(ax.patches):
+        pct = 100 * p.get_height() / total
+        ax.annotate(f'{int(p.get_height())}\n({pct:.1f}%)',
+                    (p.get_x() + p.get_width()/2., p.get_height()),
+                    ha='center', va='bottom', fontsize=11, fontweight='bold')
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300)
+    plt.close()
+
+def plot_feature_distributions(df: pd.DataFrame, features: list, target: str, save_path: str):
+    custom_palette = ['#3498db', '#e74c3c']
+    fig, axes = plt.subplots(len(features), 1, figsize=(12, 4*len(features)))
+
+    for i, feature in enumerate(features):
+        sns.histplot(data=df, x=feature, hue=target, kde=True,
+                     palette=custom_palette, alpha=0.6, bins=30,
+                     ax=axes[i], hue_order=[0, 1])
+        axes[i].set_title(f'Distribution of {feature} by {target}', fontsize=14, fontweight='bold')
+        axes[i].set_xlabel(feature)
+        axes[i].set_ylabel('Frequency')
+
+        for j, (val, color, label) in enumerate(zip([0, 1], custom_palette, ['Good Credit', 'Bad Credit'])):
+            mean_val = df[df[target] == val][feature].mean()
+            axes[i].axvline(x=mean_val, color=color, linestyle='--', linewidth=2)
+            y = axes[i].get_ylim()[1] * (0.9 - j*0.15)
+            axes[i].text(mean_val, y, f'{label} Mean: {mean_val:.2f}',
+                         ha='center', va='top', color=color,
+                         bbox=dict(facecolor='white', alpha=0.7, edgecolor=color))
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300)
+    plt.close()
