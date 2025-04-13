@@ -24,7 +24,8 @@ RUN pip install pandas==2.2.3 \
     scikit-learn==1.3.0 \
     click==8.1.7 \
     requests==2.32.3 \
-    pytest==8.3.5
+    pytest==8.3.5 \
+    pyarrow==19.0.1
 
 RUN mkdir -p /app && chown -R root:root /app && chmod -R 777 /app && chmod -R 755 /app
 

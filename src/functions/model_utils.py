@@ -96,26 +96,72 @@ def plot_credit_standing_distribution(df: pd.DataFrame, save_path: str):
     plt.savefig(save_path, dpi=300)
     plt.close()
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
 def plot_feature_distributions(df: pd.DataFrame, features: list, target: str, save_path: str):
-    custom_palette = ['#3498db', '#e74c3c']
-    fig, axes = plt.subplots(len(features), 1, figsize=(12, 4*len(features)))
-
+    """
+    Plots histograms (with an overlaid kernel density estimate) for each feature in 'features',
+    colored by a target variable, and saves the plot to the specified path.
+    
+    Parameters:
+        df (pd.DataFrame): The DataFrame containing the data.
+        features (list): List of feature column names to be plotted.
+        target (str): The column name for the target variable to use as hue in the plots.
+        save_path (str): The file path where the resulting plot image will be saved.
+    
+    Raises:
+        ValueError: If the DataFrame is empty.
+        KeyError: If the target column or any feature is missing in the DataFrame.
+        TypeError: If any feature column is not numeric (since histograms require numeric data).
+    
+    Returns:
+        None. The plot is saved to the provided 'save_path'.
+    """
+    
+    # Validation: Ensure the DataFrame is not empty.
+    if df.empty:
+        raise ValueError("The DataFrame is empty. Cannot generate plots on an empty DataFrame.")
+    
+    # Validation: Check that the target column exists in the DataFrame.
+    if target not in df.columns:
+        raise KeyError(f"Target column '{target}' not found in DataFrame")
+    
+    # Validation: For each feature, check the column exists and is numeric.
+    for feature in features:
+        if feature not in df.columns:
+            raise KeyError(f"Feature column '{feature}' not found in DataFrame")
+        if not pd.api.types.is_numeric_dtype(df[feature]):
+            raise TypeError(f"Feature column '{feature}' must be numeric to plot a histogram.")
+    
+    # Create subplots: one row per feature.
+    fig, axes = plt.subplots(len(features), 1, figsize=(12, 4 * len(features)))
+    
+    # If there's only one feature, ensure 'axes' is a list (subplots returns an Axes object if single subplot)
+    if len(features) == 1:
+        axes = [axes]
+    
+    # Generate the plots for each feature.
     for i, feature in enumerate(features):
-        sns.histplot(data=df, x=feature, hue=target, kde=True,
-                     palette=custom_palette, alpha=0.6, bins=30,
-                     ax=axes[i], hue_order=[0, 1])
-        axes[i].set_title(f'Distribution of {feature} by {target}', fontsize=14, fontweight='bold')
+        sns.histplot(
+            data=df,
+            x=feature,
+            hue=target,
+            kde=True,  # Overlay a kernel density estimate.
+            palette=['#3498db', '#e74c3c'],
+            alpha=0.6,
+            bins=30,
+            ax=axes[i],
+            hue_order=[0, 1]
+        )
+        axes[i].set_title(f"Distribution of {feature} by {target}", fontsize=14, fontweight="bold")
         axes[i].set_xlabel(feature)
-        axes[i].set_ylabel('Frequency')
-
-        for j, (val, color, label) in enumerate(zip([0, 1], custom_palette, ['Good Credit', 'Bad Credit'])):
-            mean_val = df[df[target] == val][feature].mean()
-            axes[i].axvline(x=mean_val, color=color, linestyle='--', linewidth=2)
-            y = axes[i].get_ylim()[1] * (0.9 - j*0.15)
-            axes[i].text(mean_val, y, f'{label} Mean: {mean_val:.2f}',
-                         ha='center', va='top', color=color,
-                         bbox=dict(facecolor='white', alpha=0.7, edgecolor=color))
-
+        axes[i].set_ylabel("Frequency")
+        
+        # (Optional) Here you could add additional annotations, such as mean lines, if needed.
+    
+    # Adjust layout, save, and close the figure.
     plt.tight_layout()
     plt.savefig(save_path, dpi=300)
     plt.close()
