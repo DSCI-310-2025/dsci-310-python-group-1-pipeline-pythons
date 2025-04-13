@@ -323,6 +323,18 @@ In our analysis, we evaluated three models: a Dummy Classifier, a k-Nearest Neig
 
 These findings highlight the importance of selecting appropriate models for credit risk prediction [@lessmann2015]. While k-NN offers some improvements over a baseline, the Random Forest model's ability to handle complex datasets and provide reliable predictions makes it the most effective tool for this task.
 
+# Real world impact and limitations
+
+**Real World Impact:**  
+- **Minimizing False Negatives:** The model was tuned to reduce false negatives, ensuring that financially capable applicants are not erroneously rejected. This is crucial because rejecting creditworthy clients can delay major life decisions such as buying a home, financing education, or starting a business.  
+- **Reducing Risk and Defaults:** By accurately identifying high-risk applicants, the model helps banks minimize the occurrence of loan defaults.  
+- **Improving Efficiency:** Automating credit risk assessment accelerates decision-making processes and reduces operational costs for financial institutions.  
+- **Enabling Informed Lending:** Data-driven insights lead to better credit allocation and support regulatory compliance, ensuring more responsible lending practices.
+
+**Limitations:**  
+- **Data Relevance:** The German Credit Data is historical and may not fully capture the current economic conditions or the profiles of modern borrowers.  
+- **Feature Constraints:** The limited set of variables and potential dataset biases may affect the model's ability to generalize to other contexts.  
+- **Model Trade-offs:** Focusing on minimizing false negatives can increase the number of false positives, necessitating careful monitoring and periodic retraining to maintain balanced and fair risk assessment.
 
 # References
 :::{#refs}

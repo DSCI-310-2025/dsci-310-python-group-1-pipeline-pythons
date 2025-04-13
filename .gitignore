@@ -4,5 +4,6 @@ data/.DS_Store
 
 # Python bytecode
 __pycache__/
+.pytest_cache
 *.py[cod]
 *$py.class
