@@ -46,6 +46,7 @@ The analysis requires the following Python packages, which are installed in the 
 - requests==2.32.3
 - pytest==8.3.5
 - pyarrow (recommended for future compatibility with pandas)
+- creditriskutilities==1.0.1
 
 ___
 
