@@ -16,12 +16,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from functions.model_utils import (
+from creditriskutilities import (create_output_dir,
     plot_corr_barplot,
     plot_credit_standing_distribution,
-    plot_feature_distributions
-)
-from creditriskutilities import (create_output_dir)
+    plot_feature_distributions)
 
 @click.command()
 @click.option('--input', default="../data/processed/german_processed.csv", show_default=True, help="Path to processed input file")
