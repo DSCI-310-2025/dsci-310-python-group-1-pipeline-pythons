@@ -29,11 +29,8 @@ RUN pip install pandas==2.2.3 \
     click==8.1.7 \
     requests==2.32.3 \
     pytest==8.3.5 \
-    pyarrow==19.0.1
-
-RUN pip install --index-url https://test.pypi.org/simple/ \
-    --extra-index-url https://pypi.org/simple \
-    creditriskutilities==1.0.1
+    pyarrow==19.0.1 \
+    creditriskutilities==1.0.2
 
 
 # Create the application directory with appropriate permissions
@@ -63,4 +60,4 @@ RUN chown -R root /app
 EXPOSE 8888
 
 # Start Jupyter Notebook server
-CMD ["jupyter", "notebook", "--ip=0.0.0.
+CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
